@@ -19,9 +19,8 @@ const App: React.FC = () => {
   const [activeView, setActiveView] = useState<string>('chat');
   const [isEmbedMode, setIsEmbedMode] = useState<boolean>(false);
 
-  // Reference to call clear history and release spirit in LaevusChat
+  // Reference to call clear history in LaevusChat
   const clearHistoryFnRef = useRef<() => void>(() => {});
-  const releaseSpiritFnRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     // Dynamic but persistent session ID per tab session
@@ -44,11 +43,13 @@ const App: React.FC = () => {
       setIsEmbedMode(true);
     }
 
-    if (viewParam && ['voice-settings', 'upload-spread', 'tarot', 'encyclopedia', 'afterlife', 'transcripts', 'inner-work', 'account', 'chat'].includes(viewParam)) {
+    const validViews = ['divination', 'account', 'voice-settings', 'upload-spread', 'tarot', 'encyclopedia', 'transcripts', 'inner-work', 'chat'];
+
+    if (viewParam && validViews.includes(viewParam)) {
       setActiveView(viewParam);
     } else {
       const path = window.location.pathname.replace(/^\//, '');
-      if (['voice-settings', 'upload-spread', 'tarot', 'encyclopedia', 'afterlife', 'transcripts', 'inner-work', 'account'].includes(path)) {
+      if (validViews.includes(path)) {
         setActiveView(path);
       }
     }
@@ -68,10 +69,6 @@ const App: React.FC = () => {
 
   const handleRegisterClearHistory = useCallback((handler: () => void) => {
     clearHistoryFnRef.current = handler;
-  }, []);
-
-  const handleRegisterReleaseSpirit = useCallback((handler: () => void) => {
-    releaseSpiritFnRef.current = handler;
   }, []);
 
   const openAuthModal = useCallback((registerMode: boolean) => {
@@ -96,7 +93,7 @@ const App: React.FC = () => {
                   <span className="font-syne font-extrabold text-[#F8F7F4] tracking-tight">LAEVUS</span>
                   <span className="text-zinc-600">|</span>
                   <span className="text-[10px] text-[#E60026] uppercase font-bold tracking-wider">
-                    {activeView === 'encyclopedia' ? 'Living Tarot Encyclopedia' : activeView === 'tarot' ? '3-Card Oracle' : activeView}
+                    {activeView === 'divination' ? 'Divination Sanctuary' : activeView === 'account' ? 'Account Hub' : activeView === 'encyclopedia' ? 'Living Tarot Encyclopedia' : activeView === 'tarot' ? '3-Card Oracle' : activeView}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -140,13 +137,11 @@ const App: React.FC = () => {
             {activeView === 'upload-spread' && (
               <UploadSpread 
                 onReturnToChat={() => setActiveView('chat')}
-                onCompleteReading={() => {
-                  // Keep on the synthesis view to review reading or user can return to chat
-                }} 
+                onCompleteReading={() => {}} 
               />
             )}
 
-            {/* CORE CHAT & TAROT ORACLE WORKSPACE */}
+            {/* CORE CHAT & DIVINATION WORKSPACE */}
             {activeView !== 'voice-settings' && activeView !== 'upload-spread' && (
               <LaevusChat 
                 activeView={activeView}
@@ -158,7 +153,6 @@ const App: React.FC = () => {
                 showUpgradeModal={showUpgradeModal}
                 setShowUpgradeModal={setShowUpgradeModal}
                 onRegisterClearHistory={handleRegisterClearHistory}
-                onRegisterReleaseSpirit={handleRegisterReleaseSpirit}
                 currentUser={currentUser}
                 onOpenAuth={openAuthModal}
               />

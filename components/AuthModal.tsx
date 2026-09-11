@@ -6,12 +6,13 @@ import {
   sendEmailVerification, 
   onAuthStateChanged,
   sendPasswordResetEmail,
-  User
+  User,
+  signInWithPopup
 } from 'firebase/auth';
-import { auth, db } from '../services/firebase';
+import { auth, db, googleProvider } from '../services/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, ShieldAlert, CheckCircle, RefreshCw } from 'lucide-react';
+import { X, Mail, Lock, ShieldAlert, CheckCircle, RefreshCw, Circle } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -226,6 +227,71 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onUserCha
       }, 1000);
     } catch (err: any) {
       setError('Failed to close the channel.');
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    setError('');
+    setSuccess('');
+    setLoading(true);
+    
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      
+      // Save/update user info in Firestore
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      
+      if (userDocSnap.exists()) {
+        // Existing user - update last login
+        const existingData = userDocSnap.data();
+        const existingHistory = existingData.loginHistory || [];
+        const newHistory = [
+          {
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            action: 'login_google'
+          },
+          ...existingHistory
+        ].slice(0, 50);
+        
+        await setDoc(userDocRef, {
+          email: user.email,
+          uid: user.uid,
+          lastLoginAt: new Date().toISOString(),
+          loginHistory: newHistory
+        }, { merge: true });
+      } else {
+        // New user - create initial record
+        await setDoc(userDocRef, {
+          email: user.email,
+          uid: user.uid,
+          createdAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+          loginHistory: [{
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            action: 'register_google'
+          }]
+        }, { merge: true });
+      }
+      
+      setSuccess('Vessel authenticated via Google. Welcome.');
+      setTimeout(() => {
+        onClose();
+      }, 1500);
+    } catch (err: any) {
+      console.error(err);
+      if (err.code === 'auth/popup-closed-by-user') {
+        setError('Authentication ritual interrupted. The portal was closed.');
+      } else if (err.code === 'auth/account-exists-with-different-credential') {
+        setError('This email is already registered with a different authentication method.');
+      } else {
+        setError(err.message || 'The Google portal failed to open.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -462,6 +528,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onUserCha
                       )}
                     </button>
                   </form>
+
+                  {/* Divider */}
+                  <div className="relative py-3">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-zinc-850"></div>
+                    </div>
+                    <div className="relative flex justify-center text-[9px] uppercase tracking-wider">
+                      <span className="bg-[#111113] px-3 text-zinc-500 font-mono">Or continue with</span>
+                    </div>
+                  </div>
+
+                  {/* Google Sign-In Button */}
+                  <button
+                    type="button"
+                    onClick={handleGoogleAuth}
+                    disabled={loading}
+                    className="w-full py-2.5 bg-white hover:bg-zinc-100 text-black font-bold font-mono tracking-wider rounded-xl transition-all duration-250 uppercase flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    <Circle className="w-4 h-4" />
+                    {loading ? 'Channeling...' : 'Google Portal'}
+                  </button>
 
                   <div className="text-center pt-2">
                     <button

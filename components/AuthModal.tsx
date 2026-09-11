@@ -210,6 +210,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onUserCha
         setError('Your password is too fragile. Cast a stronger one (at least 6 characters).');
       } else if (err.code === 'auth/invalid-credential') {
         setError('Invalid credentials. The vault remains sealed.');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError(`Domain not authorized: "${window.location.hostname}". Add this domain in Firebase Console > Authentication > Settings > Authorized domains.`);
       } else {
         setError(err.message || 'An error occurred during spiritual registration.');
       }
@@ -287,6 +289,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onUserCha
         setError('Authentication ritual interrupted. The portal was closed.');
       } else if (err.code === 'auth/account-exists-with-different-credential') {
         setError('This email is already registered with a different authentication method.');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError(`Domain not authorized: "${window.location.hostname}". Add this domain in Firebase Console > Authentication > Settings > Authorized domains.`);
       } else {
         setError(err.message || 'The Google portal failed to open.');
       }

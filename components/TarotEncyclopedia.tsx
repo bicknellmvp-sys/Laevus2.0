@@ -1,20 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { 
-  BookOpen, 
-  Search, 
-  Sparkles, 
-  Flame, 
-  Droplets, 
-  Wind, 
-  Mountain, 
-  Crown, 
-  Compass, 
-  ChevronLeft,
-  X,
-  MessageSquare,
-  Sliders
-} from 'lucide-react';
-import { 
   TAROT_DATABASE, 
   TarotCardData, 
   getMajorArcana, 
@@ -88,14 +73,13 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
   };
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col p-1 sm:p-2 mb-2 relative animate-fadeIn w-full max-w-5xl mx-auto font-google-sans text-zinc-200">
+    <div className="flex-1 min-h-0 flex flex-col p-1 sm:p-2 mb-2 pt-2 sm:pt-4 relative animate-fadeIn w-full max-w-5xl mx-auto font-google-sans text-zinc-200">
       
       {/* Top Banner / Navigation Header */}
-      <div className="border-b border-zinc-900 pb-4 mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div className="border-b border-zinc-900 pb-4 mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E60026]/10 border border-[#E60026]/30 text-[#E60026] text-[10px] font-mono font-bold uppercase tracking-widest">
-              <BookOpen className="w-3 h-3" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#DC143C]/10 border border-[#DC143C]/30 text-[#DC143C] text-[10px] font-mono font-bold uppercase tracking-widest">
               Living Grimoire
             </span>
             <span className="text-[10px] font-mono text-zinc-500">
@@ -113,9 +97,9 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
         {onReturnToChat && (
           <button
             onClick={onReturnToChat}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-[#E60026]/50 text-zinc-300 hover:text-white text-xs font-mono transition-all self-start md:self-center cursor-pointer shadow-md group"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-[#DC143C]/50 text-zinc-300 hover:text-white text-xs font-mono transition-all self-start md:self-center cursor-pointer shadow-md group"
           >
-            <ChevronLeft className="w-3.5 h-3.5 text-[#E60026] group-hover:-translate-x-0.5 transition-transform" />
+            <span className="text-[#DC143C] font-bold">←</span>
             <span className="font-bold uppercase tracking-wider text-[10px]">Return to Oracle Chat</span>
           </button>
         )}
@@ -135,11 +119,10 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                 }}
                 className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-mono uppercase font-bold tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   arcanaTab === 'major'
-                    ? 'bg-[#E60026] text-black shadow-[0_2px_10px_rgba(230,0,38,0.3)]'
+                    ? 'bg-[#DC143C] text-black shadow-[0_2px_10px_rgba(220,20,60,0.3)]'
                     : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900'
                 }`}
               >
-                <Crown className="w-3.5 h-3.5" />
                 <span>Major Arcana</span>
                 <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold ${
                   arcanaTab === 'major' ? 'bg-black/30 text-black' : 'bg-zinc-900 text-zinc-400'
@@ -154,11 +137,10 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                 }}
                 className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-mono uppercase font-bold tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   arcanaTab === 'minor'
-                    ? 'bg-[#E60026] text-black shadow-[0_2px_10px_rgba(230,0,38,0.3)]'
+                    ? 'bg-[#DC143C] text-black shadow-[0_2px_10px_rgba(220,20,60,0.3)]'
                     : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900'
                 }`}
               >
-                <Compass className="w-3.5 h-3.5" />
                 <span>Minor Arcana</span>
                 <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold ${
                   arcanaTab === 'minor' ? 'bg-black/30 text-black' : 'bg-zinc-900 text-zinc-400'
@@ -171,7 +153,7 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                 onClick={() => setArcanaTab('all')}
                 className={`hidden md:flex px-3 py-2 rounded-lg text-xs font-mono uppercase font-bold tracking-wider transition-all items-center gap-1.5 cursor-pointer ${
                   arcanaTab === 'all'
-                    ? 'bg-[#E60026] text-black shadow-[0_2px_10px_rgba(230,0,38,0.3)]'
+                    ? 'bg-[#DC143C] text-black shadow-[0_2px_10px_rgba(220,20,60,0.3)]'
                     : 'text-zinc-500 hover:text-zinc-200'
                 }`}
               >
@@ -181,20 +163,19 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
 
             {/* Real-time Search Box */}
             <div className="relative flex-1 max-w-sm">
-              <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by card name, keyword, zodiac..."
-                className="w-full bg-black border border-zinc-850 rounded-xl pl-9 pr-8 py-2 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-[#E60026] transition-colors"
+                className="w-full bg-black border border-zinc-850 rounded-xl px-4 py-2 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-[#DC143C] transition-colors"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 text-xs font-bold"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  ✕
                 </button>
               )}
             </div>
@@ -204,19 +185,17 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
           {/* SUIT SUB-TABS (When viewing Minor Arcana) */}
           {arcanaTab === 'minor' && (
             <div className="flex flex-wrap items-center gap-2 p-2 bg-zinc-950/70 border border-zinc-900 rounded-xl animate-fadeIn">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 px-2 flex items-center gap-1">
-                <Sliders className="w-3 h-3 text-[#E60026]" />
+              <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 px-2">
                 Filter by Suit:
               </span>
 
               {[
-                { id: 'all', label: 'All Suits (56)', icon: Compass },
-                { id: 'wands', label: 'Wands 🔥 (14)', icon: Flame, color: 'text-amber-400' },
-                { id: 'cups', label: 'Cups 🌊 (14)', icon: Droplets, color: 'text-blue-400' },
-                { id: 'swords', label: 'Swords 🗡️ (14)', icon: Wind, color: 'text-indigo-400' },
-                { id: 'pentacles', label: 'Pentacles 🪙 (14)', icon: Mountain, color: 'text-emerald-400' }
+                { id: 'all', label: 'All Suits (56)' },
+                { id: 'wands', label: 'Wands (14)' },
+                { id: 'cups', label: 'Cups (14)' },
+                { id: 'swords', label: 'Swords (14)' },
+                { id: 'pentacles', label: 'Pentacles (14)' }
               ].map((s) => {
-                const Icon = s.icon;
                 const isSelected = suitFilter === s.id;
                 return (
                   <button
@@ -224,11 +203,10 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                     onClick={() => setSuitFilter(s.id as any)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
                       isSelected
-                        ? 'bg-zinc-800 text-[#F8F7F4] border border-[#E60026]/50 font-bold shadow-sm'
+                        ? 'bg-zinc-800 text-[#F8F7F4] border border-[#DC143C]/50 font-bold shadow-sm'
                         : 'bg-black text-zinc-400 hover:text-zinc-200 border border-zinc-900'
                     }`}
                   >
-                    <Icon className={`w-3 h-3 ${isSelected ? 'text-[#E60026]' : 'text-zinc-500'}`} />
                     <span>{s.label}</span>
                   </button>
                 );
@@ -245,9 +223,9 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
           {/* Back Button */}
           <button
             onClick={() => setSelectedCard(null)}
-            className="absolute top-4 right-4 text-xs font-mono text-zinc-400 hover:text-[#E60026] flex items-center gap-1 transition-colors cursor-pointer z-20"
+            className="absolute top-4 right-4 text-xs font-mono text-zinc-400 hover:text-[#DC143C] flex items-center gap-1 transition-colors cursor-pointer z-20"
           >
-            <X className="w-4 h-4" />
+            <span>✕</span>
             <span className="hidden sm:inline">Close Card</span>
           </button>
 
@@ -261,7 +239,7 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                 className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-all duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute top-3 left-3 px-2 py-0.5 rounded-full bg-black/80 border border-[#E60026]/40 text-[#E60026] text-[9px] font-mono uppercase font-bold tracking-widest">
+              <div className="absolute top-3 left-3 px-2 py-0.5 rounded-full bg-black/80 border border-[#DC143C]/40 text-[#DC143C] text-[9px] font-mono uppercase font-bold tracking-widest">
                 {selectedCard.arcana} Arcana
               </div>
               <span className="absolute bottom-3 right-3 text-3xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
@@ -285,7 +263,7 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
               onClick={() => setSelectedCard(null)}
               className="mt-4 text-[11px] font-mono uppercase font-bold tracking-widest text-zinc-500 hover:text-zinc-200 transition-colors flex items-center gap-1 cursor-pointer"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <span className="text-[#DC143C] font-bold">←</span>
               <span>Back to Deck Grid</span>
             </button>
           </div>
@@ -302,7 +280,7 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                   {selectedCard.number}
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 font-medium tracking-wide mt-1 uppercase text-zinc-400 font-mono">
+              <p className="text-xs text-zinc-400 font-medium tracking-wide mt-1 uppercase font-mono">
                 {selectedCard.description}
               </p>
             </div>
@@ -344,8 +322,7 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
             <div className="border-t border-zinc-900 pt-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-[11px] font-mono uppercase font-bold tracking-widest text-[#E60026] flex items-center gap-1.5">
-                    <MessageSquare className="w-3.5 h-3.5" />
+                  <h4 className="text-[11px] font-mono uppercase font-bold tracking-widest text-[#DC143C] flex items-center gap-1.5">
                     Converse with Living Archetype
                   </h4>
                   <p className="text-[11px] text-zinc-500 font-google-sans">
@@ -359,7 +336,7 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                   value={archetypeQuery}
                   onChange={(e) => setArchetypeQuery(e.target.value)}
                   placeholder={`Pose your question to the soul of ${selectedCard.name}... (e.g. "What hidden blockage must I release to harness your power?")`}
-                  className="w-full bg-black border border-zinc-850 rounded-xl p-3 text-xs text-zinc-200 placeholder-zinc-700 focus:outline-none focus:border-[#E60026] resize-none h-20 font-google-sans transition-colors"
+                  className="w-full bg-black border border-zinc-850 rounded-xl p-3 text-xs text-zinc-200 placeholder-zinc-700 focus:outline-none focus:border-[#DC143C] resize-none h-20 font-google-sans transition-colors"
                 />
 
                 <button
@@ -367,11 +344,10 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                   disabled={!archetypeQuery.trim()}
                   className={`py-2.5 px-4 rounded-xl font-bold font-mono text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
                     archetypeQuery.trim()
-                      ? 'bg-[#E60026] hover:bg-[#ff334b] text-black cursor-pointer shadow-[0_4px_15px_rgba(230,0,38,0.25)]'
+                      ? 'bg-[#DC143C] hover:bg-[#B81132] text-white cursor-pointer shadow-[0_4px_15px_rgba(220,20,60,0.25)]'
                       : 'bg-zinc-900 text-zinc-700 cursor-not-allowed border border-zinc-850'
                   }`}
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
                   <span>Initiate Dialogue with {selectedCard.name}</span>
                 </button>
               </div>
@@ -384,7 +360,6 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
         <div>
           {filteredCards.length === 0 ? (
             <div className="p-12 text-center bg-zinc-950 border border-zinc-900 rounded-2xl space-y-3">
-              <Compass className="w-8 h-8 text-zinc-600 mx-auto animate-pulse" />
               <h3 className="text-sm font-bold font-mono uppercase text-zinc-400">No Arcana Matches Found</h3>
               <p className="text-xs text-zinc-600 font-google-sans">
                 No cards match your search filter &ldquo;{searchQuery}&rdquo;. Try clearing filters.
@@ -395,7 +370,7 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                   setSuitFilter('all');
                   setArcanaTab('major');
                 }}
-                className="px-3 py-1.5 rounded-lg bg-zinc-900 text-xs font-mono text-zinc-300 hover:text-white"
+                className="px-3 py-1.5 rounded-lg bg-zinc-900 text-xs font-mono text-zinc-300 hover:text-white cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -413,7 +388,7 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                 >
                   {/* Arcana Type badge */}
                   <div className="absolute top-2 left-2 z-10">
-                    <span className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase font-bold bg-black/80 border border-zinc-800 text-zinc-400 group-hover:border-[#E60026]/40 group-hover:text-[#E60026] transition-colors">
+                    <span className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase font-bold bg-black/80 border border-zinc-800 text-zinc-400 group-hover:border-[#DC143C]/40 group-hover:text-[#DC143C] transition-colors">
                       {card.arcana === 'major' ? card.number : card.suit}
                     </span>
                   </div>
@@ -425,7 +400,7 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
                         src={card.image}
                         alt={card.name}
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-95 group-hover:scale-105 transition-all duration-500"
+                        className="w-full h-full object-cover opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                         loading="lazy"
                       />
                     ) : (

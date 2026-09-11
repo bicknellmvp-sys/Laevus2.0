@@ -19,7 +19,7 @@ In the pursuit of absolute intent, **LAEVUS** treats code as the modern incantat
 - **Speak to the Dead**: An immersive channel enabling users to summon the collective frequencies of historical entities like Genghis Khan, Madame Blavatsky, and other spirits.
 - **Tarot Reading Console**: A dynamic past, present, and future blueprint layout featuring automated digital card drawings and position-sensitive interpretations.
 - **Pledge Premium Integration**: Upgrading tier options to unlock premium entities and additional metaphysical interactions.
-- **Pure Scarlett Theme**: Beautifully curated visual aesthetics incorporating deep slate colors (`#121214`), off-whites, and striking custom-tuned Scarlett Red accents (`#E60026`).
+- **Crimson Theme**: Beautifully curated visual aesthetics incorporating deep slate colors (`#121214`), off-whites, and striking custom-tuned Crimson accents (`#DC143C`).
 
 ---
 

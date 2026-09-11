@@ -1,18 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Volume2, 
-  VolumeX, 
-  Play, 
-  Square, 
-  RotateCcw, 
-  Sparkles, 
-  Sliders, 
-  Radio, 
-  Check, 
-  Headphones,
-  ChevronLeft
-} from 'lucide-react';
-import { 
   VoiceSettings as VoiceSettingsType, 
   getSavedVoiceSettings, 
   saveVoiceSettings, 
@@ -89,7 +76,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
       <div className="border-b border-zinc-900 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] uppercase font-mono tracking-widest text-[#E60026] font-bold bg-[#E60026]/10 px-2 py-0.5 rounded border border-[#E60026]/30">
+            <span className="text-[10px] uppercase font-mono tracking-widest text-[#DC143C] font-bold bg-[#DC143C]/10 px-2 py-0.5 rounded border border-[#DC143C]/30">
               Aural Resonance Conduit
             </span>
             {savedNotice && (
@@ -110,9 +97,9 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
           {onReturnToChat && (
             <button
               onClick={onReturnToChat}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-[#E60026]/50 text-zinc-300 hover:text-white text-xs font-mono transition-all cursor-pointer shadow-md group"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-[#DC143C]/50 text-zinc-300 hover:text-white text-xs font-mono transition-all cursor-pointer shadow-md group"
             >
-              <ChevronLeft className="w-3.5 h-3.5 text-[#E60026] group-hover:-translate-x-0.5 transition-transform" />
+              <span className="text-[#DC143C] font-bold">←</span>
               <span className="font-bold uppercase tracking-wider text-[10px]">Return to Oracle Chat</span>
             </button>
           )}
@@ -120,16 +107,12 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
           {/* Global Master Audio Toggle */}
           <div className="flex items-center gap-3 bg-black border border-zinc-900 rounded-xl p-2.5 shadow-lg">
             <div className="flex items-center gap-2">
-              {settings.enabled ? (
-                <Volume2 className="w-4 h-4 text-[#E60026] animate-pulse" />
-              ) : (
-                <VolumeX className="w-4 h-4 text-zinc-600" />
-              )}
+              <span className={`w-2 h-2 rounded-full ${settings.enabled ? 'bg-[#DC143C] animate-pulse' : 'bg-zinc-700'}`} />
               <div className="flex flex-col">
                 <span className="text-[9px] uppercase font-mono font-bold tracking-wider text-zinc-400">
                   Audio Synthesis
                 </span>
-                <span className={`text-[11px] font-bold ${settings.enabled ? 'text-[#E60026]' : 'text-zinc-600'}`}>
+                <span className={`text-[11px] font-bold ${settings.enabled ? 'text-[#DC143C]' : 'text-zinc-600'}`}>
                   {settings.enabled ? 'ENABLED' : 'MUTED'}
                 </span>
               </div>
@@ -138,7 +121,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
             <button
               onClick={() => handleUpdate({ enabled: !settings.enabled })}
               className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 cursor-pointer ${
-                settings.enabled ? 'bg-[#E60026]' : 'bg-zinc-800'
+                settings.enabled ? 'bg-[#DC143C]' : 'bg-zinc-800'
               }`}
               aria-label="Toggle Audio Synthesis"
             >
@@ -158,7 +141,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 font-bold flex items-center gap-1.5">
-              <Radio className="w-3.5 h-3.5 text-[#E60026]" />
+              <span className="text-[#DC143C]">✦</span>
               Select Voice Persona
             </span>
             <span className="text-[10px] font-mono text-zinc-600">4 Conduits Available</span>
@@ -173,7 +156,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
                   onClick={() => handlePersonaSelect(profile.id)}
                   className={`p-4 rounded-xl border text-left transition-all duration-300 relative group flex flex-col justify-between cursor-pointer ${
                     isSelected
-                      ? 'bg-zinc-950 border-[#E60026] shadow-[0_0_20px_rgba(230,0,38,0.15)] ring-1 ring-[#E60026]/40'
+                      ? 'bg-zinc-950 border-[#DC143C] shadow-[0_0_20px_rgba(220,20,60,0.15)] ring-1 ring-[#DC143C]/40'
                       : 'bg-black border-zinc-900 hover:border-zinc-800 hover:bg-zinc-950/60'
                   }`}
                 >
@@ -189,15 +172,15 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
                           }`}>
                             {profile.title}
                           </h4>
-                          <span className="text-[9px] text-[#E60026] font-mono block">
+                          <span className="text-[9px] text-[#DC143C] font-mono block">
                             {profile.tone}
                           </span>
                         </div>
                       </div>
 
                       {isSelected && (
-                        <div className="w-4 h-4 rounded-full bg-[#E60026] text-black flex items-center justify-center">
-                          <Check className="w-2.5 h-2.5 stroke-[3]" />
+                        <div className="w-4 h-4 rounded-full bg-[#DC143C] text-white flex items-center justify-center text-[9px] font-bold">
+                          ✓
                         </div>
                       )}
                     </div>
@@ -218,12 +201,12 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
 
           {/* Persona Live Quote Card */}
           <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-xl space-y-2 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#E60026]/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#DC143C]/5 rounded-full blur-2xl pointer-events-none" />
             <div className="flex items-center gap-2 text-[9px] font-mono uppercase tracking-widest text-zinc-500 font-bold">
-              <Sparkles className="w-3 h-3 text-[#E60026]" />
+              <span className="text-[#DC143C]">✦</span>
               Active Astral Matrix Quote
             </div>
-            <p className="text-xs text-zinc-300 italic font-google-sans pl-2 border-l-2 border-[#E60026]">
+            <p className="text-xs text-zinc-300 italic font-google-sans pl-2 border-l-2 border-[#DC143C]">
               "{activeProfile.testPhrase}"
             </p>
           </div>
@@ -233,14 +216,13 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
         <div className="lg:col-span-5 space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 font-bold flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-[#E60026]" />
+              <span className="text-[#DC143C]">✦</span>
               Granular Modulation
             </span>
             <button
               onClick={handleResetDefaults}
               className="text-[9px] uppercase font-mono text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors cursor-pointer"
             >
-              <RotateCcw className="w-2.5 h-2.5" />
               Reset Sliders
             </button>
           </div>
@@ -253,7 +235,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
                 <label className="text-[10px] uppercase font-mono font-bold tracking-wider text-zinc-300">
                   Resonance Pitch
                 </label>
-                <span className="text-xs font-mono font-bold text-[#E60026] bg-[#E60026]/10 px-2 py-0.5 rounded border border-[#E60026]/20">
+                <span className="text-xs font-mono font-bold text-[#DC143C] bg-[#DC143C]/10 px-2 py-0.5 rounded border border-[#DC143C]/20">
                   {settings.pitch.toFixed(2)}x
                 </span>
               </div>
@@ -265,7 +247,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
                 step="0.05"
                 value={settings.pitch}
                 onChange={(e) => handleUpdate({ pitch: parseFloat(e.target.value) })}
-                className="w-full accent-[#E60026] bg-zinc-900 h-1.5 rounded-lg appearance-none cursor-pointer"
+                className="w-full accent-[#DC143C] bg-zinc-900 h-1.5 rounded-lg appearance-none cursor-pointer"
               />
 
               <div className="flex justify-between text-[8px] font-mono text-zinc-600 uppercase">
@@ -281,7 +263,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
                 <label className="text-[10px] uppercase font-mono font-bold tracking-wider text-zinc-300">
                   Vocal Cadence Speed
                 </label>
-                <span className="text-xs font-mono font-bold text-[#E60026] bg-[#E60026]/10 px-2 py-0.5 rounded border border-[#E60026]/20">
+                <span className="text-xs font-mono font-bold text-[#DC143C] bg-[#DC143C]/10 px-2 py-0.5 rounded border border-[#DC143C]/20">
                   {settings.speed.toFixed(2)}x
                 </span>
               </div>
@@ -293,7 +275,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
                 step="0.05"
                 value={settings.speed}
                 onChange={(e) => handleUpdate({ speed: parseFloat(e.target.value) })}
-                className="w-full accent-[#E60026] bg-zinc-900 h-1.5 rounded-lg appearance-none cursor-pointer"
+                className="w-full accent-[#DC143C] bg-zinc-900 h-1.5 rounded-lg appearance-none cursor-pointer"
               />
 
               <div className="flex justify-between text-[8px] font-mono text-zinc-600 uppercase">
@@ -312,30 +294,24 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
                   !settings.enabled
                     ? 'bg-zinc-900 text-zinc-700 cursor-not-allowed border border-zinc-800'
                     : isSpeaking
-                    ? 'bg-zinc-900 text-[#E60026] border border-[#E60026] shadow-[0_0_20px_rgba(230,0,38,0.2)]'
-                    : 'bg-[#E60026] hover:bg-[#ff334b] text-black shadow-[0_4px_20px_rgba(230,0,38,0.25)]'
+                    ? 'bg-zinc-900 text-[#DC143C] border border-[#DC143C] shadow-[0_0_20px_rgba(220,20,60,0.2)]'
+                    : 'bg-[#DC143C] hover:bg-[#B81132] text-white shadow-[0_4px_20px_rgba(220,20,60,0.25)]'
                 }`}
               >
                 {isSpeaking ? (
-                  <>
-                    <Square className="w-3.5 h-3.5 fill-current" />
-                    <span>Halt Vocal Transmission</span>
-                  </>
+                  <span>Halt Vocal Transmission</span>
                 ) : (
-                  <>
-                    <Play className="w-3.5 h-3.5 fill-current" />
-                    <span>Test Voice Synthesis</span>
-                  </>
+                  <span>Test Voice Synthesis</span>
                 )}
               </button>
 
               {isSpeaking && (
                 <div className="flex items-center justify-center gap-1 py-1">
-                  <div className="w-1 h-3 bg-[#E60026] rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <div className="w-1 h-5 bg-[#E60026] rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <div className="w-1 h-4 bg-[#E60026] rounded-full animate-bounce" />
-                  <div className="w-1 h-6 bg-[#E60026] rounded-full animate-bounce [animation-delay:0.1s]" />
-                  <div className="w-1 h-3 bg-[#E60026] rounded-full animate-bounce [animation-delay:0.2s]" />
+                  <div className="w-1 h-3 bg-[#DC143C] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <div className="w-1 h-5 bg-[#DC143C] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <div className="w-1 h-4 bg-[#DC143C] rounded-full animate-bounce" />
+                  <div className="w-1 h-6 bg-[#DC143C] rounded-full animate-bounce [animation-delay:0.1s]" />
+                  <div className="w-1 h-3 bg-[#DC143C] rounded-full animate-bounce [animation-delay:0.2s]" />
                   <span className="text-[10px] font-mono text-zinc-400 ml-2">Synthesizing audio wave...</span>
                 </div>
               )}
@@ -345,7 +321,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
 
           {/* Quick Guidance Info */}
           <div className="p-3 bg-zinc-950/80 border border-zinc-900/60 rounded-lg text-[10px] text-zinc-500 font-mono flex items-center gap-2">
-            <Headphones className="w-3.5 h-3.5 text-[#E60026] flex-shrink-0" />
+            <span className="text-[#DC143C]">✦</span>
             <span>Voice synthesis automatically articulates all tarot and spiritual consultations.</span>
           </div>
 

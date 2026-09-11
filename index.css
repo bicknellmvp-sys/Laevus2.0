@@ -16,7 +16,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #E60026;
+  background: #DC143C;
 }
 
 /* Animations */
@@ -37,6 +37,6 @@
 
 /* Selection */
 ::selection {
-  background-color: rgba(230, 0, 38, 0.25);
-  color: #E60026;
+  background-color: rgba(220, 20, 60, 0.25);
+  color: #DC143C;
 }

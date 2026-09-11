@@ -39,7 +39,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A clean slate. Take a leap of faith into the unknown, trusting the universe to catch you.",
     reversedMeaning: "Recklessness, fear of taking risks, holding back from a necessary journey.",
     keywords: ["beginnings", "innocence", "spontaneity", "free spirit", "potential"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m00.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/00_Fool.jpg"
   },
   {
     name: "The Magician",
@@ -53,7 +53,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "You possess all necessary elements (wands, cups, swords, pentacles) to manifest your will into reality.",
     reversedMeaning: "Untapped potential, manipulation, trickery, illusion without substance.",
     keywords: ["manifestation", "willpower", "creation", "skill", "mastery"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m01.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/01_Magician.jpg"
   },
   {
     name: "The High Priestess",
@@ -67,7 +67,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Look inward for the answers. Trust your secret instincts and the veiled mysteries of the spirit.",
     reversedMeaning: "Secrets revealed, ignoring intuition, superficiality, cognitive disconnect.",
     keywords: ["intuition", "mystery", "subconscious", "sacred wisdom", "silence"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m02.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/02_High_Priestess.jpg"
   },
   {
     name: "The Empress",
@@ -81,7 +81,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A period of bountiful growth, sensual creation, and prosperous physical expression.",
     reversedMeaning: "Creative block, smothering energy, neglect, emotional depletion.",
     keywords: ["abundance", "fertility", "sensuality", "nurture", "nature"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m03.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/03_Empress.jpg"
   },
   {
     name: "The Emperor",
@@ -95,7 +95,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Establish clear boundaries, take command of your realm, and bring disciplined order to chaos.",
     reversedMeaning: "Tyranny, rigidity, loss of control, abuse of power, micro-management.",
     keywords: ["authority", "structure", "discipline", "protection", "sovereignty"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m04.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/04_Emperor.jpg"
   },
   {
     name: "The Hierophant",
@@ -109,7 +109,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Seek guidance from higher sages, sacred lineages, and universal spiritual frameworks.",
     reversedMeaning: "Rebellion, unorthodox paths, dogmatic bondage, breaking rigid traditions.",
     keywords: ["tradition", "mentorship", "orthodoxy", "spiritual laws", "community"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m05.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/05_Hierophant.jpg"
   },
   {
     name: "The Lovers",
@@ -123,7 +123,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A critical fork in the road requiring pure alignment of heart and ethical integrity.",
     reversedMeaning: "Disharmony, misaligned values, conflict between head and heart, indecision.",
     keywords: ["harmony", "union", "crossroads", "values", "attraction"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m06.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/06_Lovers.jpg"
   },
   {
     name: "The Chariot",
@@ -137,7 +137,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Stay laser-focused. Victory over opposing forces is earned through relentless inner discipline.",
     reversedMeaning: "Loss of momentum, lack of direction, aggression, being driven off course.",
     keywords: ["determination", "focus", "victory", "momentum", "control"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m07.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/07_Chariot.jpg"
   },
   {
     name: "Strength",
@@ -151,7 +151,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Influence difficult situations with quiet compassion and moral resilience rather than brute force.",
     reversedMeaning: "Self-doubt, raw reactivity, weakness, giving in to base instincts.",
     keywords: ["fortitude", "compassion", "courage", "grace", "patience"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m08.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/08_Strength.jpg"
   },
   {
     name: "The Hermit",
@@ -165,7 +165,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Withdraw temporarily from outer noise to rekindle your personal inner spark and truth.",
     reversedMeaning: "Isolation, loneliness, withdrawal to the point of paranoia, rejecting wisdom.",
     keywords: ["solitude", "introspection", "wisdom", "inner guide", "seeking"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m09.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/09_Hermit.jpg"
   },
   {
     name: "Wheel of Fortune",
@@ -179,7 +179,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "The cosmic wheel turns. Embrace the rhythmic fluctuations of luck and universal law.",
     reversedMeaning: "Bad luck, resisting change, clinging to an obsolete cycle, broken patterns.",
     keywords: ["destiny", "karma", "cycles", "turning point", "fortune"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m10.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/10_Wheel_of_Fortune.jpg"
   },
   {
     name: "Justice",
@@ -193,7 +193,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "All accounts will balance. Decisions made now must align with absolute truth and impartiality.",
     reversedMeaning: "Injustice, dishonesty, unaccountability, legal complications, bias.",
     keywords: ["truth", "balance", "karmic law", "clarity", "integrity"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m11.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/11_Justice.jpg"
   },
   {
     name: "The Hanged Man",
@@ -207,7 +207,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Pause and yield control. A deliberate inversion of your viewpoint brings profound illumination.",
     reversedMeaning: "Pointless sacrifice, stalling, martyrdom, refusing to let go.",
     keywords: ["surrender", "pause", "perspective", "release", "enlightenment"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m12.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/12_Hanged_Man.jpg"
   },
   {
     name: "Death",
@@ -221,7 +221,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "An essential closing of a chapter, clearing the fertile ground for an inevitable new dawn.",
     reversedMeaning: "Resistance to change, lingering stagnation, fear of the unknown, delayed endings.",
     keywords: ["transformation", "endings", "rebirth", "metamorphosis", "closure"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m13.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/13_Death.jpg"
   },
   {
     name: "Temperance",
@@ -235,7 +235,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Synthesize disparate elements into a unified whole. True spiritual power thrives in balance.",
     reversedMeaning: "Excess, imbalance, disharmony, clashing extremes, impatient outbursts.",
     keywords: ["balance", "moderation", "alchemy", "peace", "synthesis"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m14.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/14_Temperance.jpg"
   },
   {
     name: "The Devil",
@@ -249,7 +249,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Acknowledge what grips you. The chains binding your spirit are self-forged and can be severed.",
     reversedMeaning: "Breaking free, shadow integration, awakening from toxic illusions, liberation.",
     keywords: ["shadow", "attachment", "addiction", "illusion", "liberation"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m15.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/15_Devil.jpg"
   },
   {
     name: "The Tower",
@@ -263,7 +263,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A lightning strike purges corrupt foundations. What collapses was not built to last.",
     reversedMeaning: "Disaster narrowly averted, clinging to a crumbling reality, delayed inevitable collapse.",
     keywords: ["awakening", "breakdown", "purification", "truth revealed", "reset"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m16.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/16_Tower.jpg"
   },
   {
     name: "The Star",
@@ -277,7 +277,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A calm, luminous light shines after the storm. Have faith in the unfolding cosmic design.",
     reversedMeaning: "Despair, lack of faith, disconnection from spirit, cynicism.",
     keywords: ["hope", "inspiration", "renewal", "serenity", "faith"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m17.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/17_Star.jpg"
   },
   {
     name: "The Moon",
@@ -291,7 +291,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Things are not what they seem in the daytime. Navigate the spectral fog through psychic sensitivity.",
     reversedMeaning: "Clearing confusion, truth emerging, releasing irrational anxiety, seeing clearly.",
     keywords: ["illusion", "dreams", "subconscious", "fear", "intuition"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m18.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/18_Moon.jpg"
   },
   {
     name: "The Sun",
@@ -305,7 +305,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Total clarity and warmth. Your endeavors receive the radiant validation of the solar center.",
     reversedMeaning: "Temporary clouds, dampened enthusiasm, hidden sadness, delayed celebration.",
     keywords: ["vitality", "success", "joy", "clarity", "confidence"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m19.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/19_Sun.jpg"
   },
   {
     name: "Judgement",
@@ -319,7 +319,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Hear the call of your higher self. Step out of your past skin and answer your destiny.",
     reversedMeaning: "Self-doubt, ignoring the inner calling, harsh self-criticism, fear of judgment.",
     keywords: ["calling", "rebirth", "awakening", "reckoning", "absolution"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m20.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/20_Judgement.jpg"
   },
   {
     name: "The World",
@@ -333,7 +333,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A great master cycle closes in total triumph and self-actualization. Celebrate your wholeness.",
     reversedMeaning: "Incomplete cycles, lack of closure, short-cutting necessary steps, delay in completion.",
     keywords: ["completion", "wholeness", "triumph", "integration", "fulfillment"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/m21.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/21_World.jpg"
   },
 
   // ==========================================
@@ -351,7 +351,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A burst of creative fire and inspiration. Take immediate action on new passions.",
     reversedMeaning: "Delays, lack of passion, creative block, burnout.",
     keywords: ["spark", "vitality", "potential", "inspiration", "passion"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w01.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands01.jpg"
   },
   {
     name: "Two of Wands",
@@ -365,7 +365,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "The world is in your hands. Plan your long-term expansion and prepare to cross horizons.",
     reversedMeaning: "Fear of the unknown, lack of planning, playing it too safe.",
     keywords: ["vision", "planning", "horizons", "decision", "expansion"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w02.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands02.jpg"
   },
   {
     name: "Three of Wands",
@@ -379,7 +379,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Your ventures have been launched into the world. Watch your ambitions bear fruit.",
     reversedMeaning: "Obstacles to progress, delayed shipments, disappointment in ventures.",
     keywords: ["foresight", "expansion", "progress", "enterprise", "arrival"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w03.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands03.jpg"
   },
   {
     name: "Four of Wands",
@@ -393,7 +393,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A joyful milestone, sacred union, or solid domestic harmony. Celebrate community bonds.",
     reversedMeaning: "Domestic tension, canceled celebrations, feeling unwelcome in one's home.",
     keywords: ["celebration", "harmony", "homecoming", "sanctuary", "milestone"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w04.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands04.jpg"
   },
   {
     name: "Five of Wands",
@@ -407,7 +407,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Healthy creative competition and divergent ideas. Rise above petty rivalry through clarity.",
     reversedMeaning: "Avoiding conflict, destructive infighting, exhaustion from endless squabbles.",
     keywords: ["competition", "rivalry", "tension", "diversity", "sparring"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w05.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands05.jpg"
   },
   {
     name: "Six of Wands",
@@ -421,7 +421,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Public triumph and validation of your persistent efforts. Walk with justified confidence.",
     reversedMeaning: "Egoism, fall from grace, lack of recognition, private failure.",
     keywords: ["victory", "recognition", "acclaim", "pride", "triumph"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w06.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands06.jpg"
   },
   {
     name: "Seven of Wands",
@@ -435,7 +435,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "You hold the energetic advantage. Stand resolute against opposition and maintain your stance.",
     reversedMeaning: "Giving up, overwhelmed by competition, feeling defeated, compromised values.",
     keywords: ["perseverance", "defense", "conviction", "advantage", "courage"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w07.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands07.jpg"
   },
   {
     name: "Eight of Wands",
@@ -449,7 +449,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Events are moving at lightning speed. Clear communication and rapid developments arrive.",
     reversedMeaning: "Delays, chaotic haste, miscommunications, stalled momentum.",
     keywords: ["speed", "swiftness", "communication", "acceleration", "flight"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w08.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands08.jpg"
   },
   {
     name: "Nine of Wands",
@@ -463,7 +463,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "You have weathered the battles and the finish line is near. Draw on your reserve strength.",
     reversedMeaning: "Exhaustion, paranoia, refusing to rest, defensive burnout.",
     keywords: ["resilience", "endurance", "grit", "stamina", "vigilance"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w09.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands09.jpg"
   },
   {
     name: "Ten of Wands",
@@ -477,7 +477,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "You have taken on immense responsibilities. Delegate or release what is no longer yours to carry.",
     reversedMeaning: "Releasing burdens, collapse under stress, learning to say no, relief.",
     keywords: ["burden", "overload", "responsibility", "exhaustion", "duty"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w10.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands10.jpg"
   },
   {
     name: "Page of Wands",
@@ -491,7 +491,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A lively messenger bringing creative impulses or eager exploratory spirit. Say yes to adventure.",
     reversedMeaning: "Procrastination, lack of direction, superficial curiosity, creative doubt.",
     keywords: ["curiosity", "enthusiasm", "discovery", "spark", "youth"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w11.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands11.jpg"
   },
   {
     name: "Knight of Wands",
@@ -505,7 +505,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Charge boldly into the arena. Fuel your ambitions with audacious, charismatic momentum.",
     reversedMeaning: "Recklessness, arrogance, short temper, starting without finishing.",
     keywords: ["passion", "adventure", "boldness", "energy", "charm"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w12.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands12.jpg"
   },
   {
     name: "Queen of Wands",
@@ -519,7 +519,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Embody your self-assurance and magnetic warmth. Command your space with joyful vibrancy.",
     reversedMeaning: "Jealousy, demanding nature, burnout, insecurity disguised as aggression.",
     keywords: ["magnetism", "warmth", "confidence", "courage", "radiance"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w13.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands13.jpg"
   },
   {
     name: "King of Wands",
@@ -533,7 +533,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Lead by bold vision and grand inspiration. You have the fire and maturity to mobilize kingdoms.",
     reversedMeaning: "Impulsive autocrat, tyrannical expectations, ruthless impatience.",
     keywords: ["vision", "leadership", "mastery", "inspiration", "authority"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/w14.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Wands14.jpg"
   },
 
   // ==========================================
@@ -551,7 +551,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "An open vessel receiving pure spiritual love, psychic empathy, and renewed heart energy.",
     reversedMeaning: "Emotional blockage, feeling unloved, repressed feelings, creative drought.",
     keywords: ["love", "compassion", "awakening", "grace", "receptivity"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c01.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups01.jpg"
   },
   {
     name: "Two of Cups",
@@ -565,7 +565,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A profound, equal partnership of mutual respect, reciprocal warmth, and deep understanding.",
     reversedMeaning: "Imbalance in connection, broken trust, misunderstandings, separation.",
     keywords: ["connection", "harmony", "partnership", "reciprocity", "attraction"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c02.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups02.jpg"
   },
   {
     name: "Three of Cups",
@@ -579,7 +579,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Rejoice in kinship and collective support. Life invites you to share joy with soul companions.",
     reversedMeaning: "Overindulgence, gossip, social exclusion, third-party interference.",
     keywords: ["celebration", "community", "kinship", "joy", "collaboration"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c03.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups03.jpg"
   },
   {
     name: "Four of Cups",
@@ -593,7 +593,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Look up from your reverie. The universe offers a sacred cup right before you if you open your eyes.",
     reversedMeaning: "Awakening from apathy, renewed motivation, accepting new opportunities.",
     keywords: ["contemplation", "apathy", "reassessment", "disillusionment", "gift"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c04.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups04.jpg"
   },
   {
     name: "Five of Cups",
@@ -607,7 +607,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Three cups lie spilled, but two remain standing behind you. Honor the grief, then turn around.",
     reversedMeaning: "Healing, forgiveness, acceptance, moving forward from heartbreak.",
     keywords: ["grief", "regret", "loss", "redirection", "acceptance"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c05.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups05.jpg"
   },
   {
     name: "Six of Cups",
@@ -621,7 +621,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A tender return to innocent roots or reconnecting with people and passions of your youth.",
     reversedMeaning: "Living in the past, idealized memories, clinging to obsolete relationships.",
     keywords: ["nostalgia", "innocence", "memories", "kindness", "reunion"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c06.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups06.jpg"
   },
   {
     name: "Seven of Cups",
@@ -635,7 +635,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Many enticing visions float in the clouds. Sift through illusions to select genuine substance.",
     reversedMeaning: "Clarity of purpose, breaking free of fantasy, grounded decisions.",
     keywords: ["choices", "fantasy", "illusion", "temptation", "discernment"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c07.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups07.jpg"
   },
   {
     name: "Eight of Cups",
@@ -649,7 +649,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Leaving behind what is emotionally spent to seek spiritual fulfillment on higher mountain paths.",
     reversedMeaning: "Fear of change, lingering in dead ends, wandering aimlessly.",
     keywords: ["departure", "seeking", "release", "higher calling", "journey"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c08.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups08.jpg"
   },
   {
     name: "Nine of Cups",
@@ -663,7 +663,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Your heart's deep wish is realized. Bask in contentment and wholesome sensory gratitude.",
     reversedMeaning: "Greed, smugness, hollow materialism, wishing without gratitude.",
     keywords: ["fulfillment", "wishes", "contentment", "gratitude", "pleasure"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c09.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups09.jpg"
   },
   {
     name: "Ten of Cups",
@@ -677,7 +677,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Enduring harmony, joyful family life, and complete emotional peace under the celestial rainbow.",
     reversedMeaning: "Domestic discord, shattered dreams, values clash in family.",
     keywords: ["bliss", "family", "harmony", "peace", "alignment"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c10.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups10.jpg"
   },
   {
     name: "Page of Cups",
@@ -691,7 +691,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A gentle soul offering imaginative insights or artistic synchronicities. Follow your heart's whisper.",
     reversedMeaning: "Emotional tantrums, creative blockage, vulnerability taken for granted.",
     keywords: ["imagination", "synchronicities", "intuitive message", "tenderness", "play"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c11.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups11.jpg"
   },
   {
     name: "Knight of Cups",
@@ -705,7 +705,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Follow the sacred ideal of romance, poetry, and artistic calling with noble grace.",
     reversedMeaning: "Overly dramatic, manipulative charm, unrealistic daydreaming.",
     keywords: ["romance", "poetry", "idealism", "invitation", "grace"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c12.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups12.jpg"
   },
   {
     name: "Queen of Cups",
@@ -719,7 +719,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Hold compassionate space. Your psychic resonance and deep emotional wisdom are your highest armor.",
     reversedMeaning: "Codependency, emotional exhaustion, psychic boundary dissolution.",
     keywords: ["empathy", "intuition", "healer", "compassion", "mysticism"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c13.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups13.jpg"
   },
   {
     name: "King of Cups",
@@ -733,7 +733,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Master your internal tides. Navigate volatile circumstances with emotional intelligence and poise.",
     reversedMeaning: "Emotional coldness, manipulative outbursts, moodiness, escapism.",
     keywords: ["mastery", "poise", "calm", "wisdom", "counsel"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/c14.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Cups14.jpg"
   },
 
   // ==========================================
@@ -751,7 +751,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A sharp epiphany cuts cleanly through confusion, deceit, and lingering fog.",
     reversedMeaning: "Hostile words, confusion, weaponized intelligence, mental block.",
     keywords: ["clarity", "breakthrough", "truth", "justice", "intellect"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s01.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords01.jpg"
   },
   {
     name: "Two of Swords",
@@ -765,7 +765,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A difficult dilemma cannot be postponed forever. Remove the blindfold and make the call.",
     reversedMeaning: "Information overload, delayed decision backfiring, breaking silence.",
     keywords: ["stalemate", "dilemma", "denial", "crossroads", "defense"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s02.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords02.jpg"
   },
   {
     name: "Three of Swords",
@@ -779,7 +779,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A pierce to the heart brings sorrow, yet opens the path to genuine, uncluttered healing.",
     reversedMeaning: "Recovery from heartbreak, releasing old wounds, lingering bitterness.",
     keywords: ["heartbreak", "sorrow", "release", "grief", "catharsis"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s03.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords03.jpg"
   },
   {
     name: "Four of Swords",
@@ -793,7 +793,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Withdraw from the fray to heal your mind and soul. Silence is medicine for your spirit.",
     reversedMeaning: "Burnout from refusing rest, forced recovery, awakening from dormancy.",
     keywords: ["recuperation", "sanctuary", "rest", "meditation", "pause"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s04.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords04.jpg"
   },
   {
     name: "Five of Swords",
@@ -807,7 +807,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Winning the battle but losing the war. Assess whether current arguments are worth the relational cost.",
     reversedMeaning: "Making amends, walking away from toxic arguments, resolving hostility.",
     keywords: ["conflict", "defeat", "costly win", "rivalry", "discord"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s05.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords05.jpg"
   },
   {
     name: "Six of Swords",
@@ -821,7 +821,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Navigating away from turbulent shores toward mental peace. The hardest stretch is behind you.",
     reversedMeaning: "Trapped in baggage, turbulent transit, resistance to healing.",
     keywords: ["transition", "recovery", "calm waters", "passage", "relief"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s06.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords06.jpg"
   },
   {
     name: "Seven of Swords",
@@ -835,7 +835,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Use strategic finesse rather than brute confrontation. Guard against deceit in your perimeter.",
     reversedMeaning: "Confessing secrets, deceit uncovered, clumsy strategy, being held accountable.",
     keywords: ["strategy", "stealth", "tact", "independence", "cleverness"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s07.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords07.jpg"
   },
   {
     name: "Eight of Swords",
@@ -849,7 +849,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "The swords surround you, but the bindings are loose. Step forward to dissolve the mental illusion.",
     reversedMeaning: "Breaking free of limiting beliefs, new freedom, mental empowerment.",
     keywords: ["limitation", "entrapment", "mindset", "illusion", "liberation"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s08.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords08.jpg"
   },
   {
     name: "Nine of Swords",
@@ -863,7 +863,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "The darkness of 3 AM magnifies worries far beyond reality. Bring fears into daylight to disarm them.",
     reversedMeaning: "Recovery from anxiety, seeking help, dawn breaking on dark nights of the soul.",
     keywords: ["anxiety", "worry", "nightmare", "overthinking", "relief"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s09.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords09.jpg"
   },
   {
     name: "Ten of Swords",
@@ -877,7 +877,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "The absolute end of a painful cycle. The worst is over, and the golden horizon cannot be halted.",
     reversedMeaning: "Slow recovery, avoiding worst outcome, regeneration from defeat.",
     keywords: ["closure", "rock bottom", "dawn", "transformation", "endings"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s10.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords10.jpg"
   },
   {
     name: "Page of Swords",
@@ -891,7 +891,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A sharp mind hungry for truth and investigation. Cut through pretense with youthful curiosity.",
     reversedMeaning: "Gossip, cynicism, sharp words, paranoia, defensive intellect.",
     keywords: ["curiosity", "intellect", "truth", "vigilance", "sharpness"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s11.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords11.jpg"
   },
   {
     name: "Knight of Swords",
@@ -905,7 +905,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Execute your ideas without hesitation. Speak your truth with fierce and unapologetic clarity.",
     reversedMeaning: "Rash speech, cutting cruelty, impatience, charging blindly without thought.",
     keywords: ["momentum", "truth", "directness", "conviction", "haste"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s12.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords12.jpg"
   },
   {
     name: "Queen of Swords",
@@ -919,7 +919,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Lead with intellectual honesty and unbiased judgment. Suffer no falsehood in your presence.",
     reversedMeaning: "Bitterness, cold detachment, cruel criticism, unforgiving nature.",
     keywords: ["discernment", "honesty", "boundaries", "clarity", "wit"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s13.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords13.jpg"
   },
   {
     name: "King of Swords",
@@ -933,7 +933,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Apply pure logic, ethical principle, and unyielding truth to govern complex realms.",
     reversedMeaning: "Tyrannical intellect, manipulation, cold calculation, dogmatic cruelty.",
     keywords: ["authority", "logic", "justice", "truth", "command"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/s14.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Swords14.jpg"
   },
 
   // ==========================================
@@ -951,7 +951,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A tangible seed of physical prosperity, career expansion, or grounded material stability.",
     reversedMeaning: "Missed financial opportunity, greed, poor foundation, short-sighted investment.",
     keywords: ["abundance", "opportunity", "wealth", "foundation", "manifestation"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p01.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents01.jpg"
   },
   {
     name: "Two of Pentacles",
@@ -965,7 +965,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Navigate multiple financial or life responsibilities with effortless grace and agility.",
     reversedMeaning: "Overwhelmed by priorities, financial disarray, dropping the ball.",
     keywords: ["balance", "adaptability", "flexibility", "priorities", "resourcefulness"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p02.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents02.jpg"
   },
   {
     name: "Three of Pentacles",
@@ -979,7 +979,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Combine your unique craftsmanship with skilled collaborators to build enduring cathedrals.",
     reversedMeaning: "Poor teamwork, substandard work, lack of alignment, unappreciated craft.",
     keywords: ["craftsmanship", "collaboration", "mastery", "teamwork", "building"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p03.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents03.jpg"
   },
   {
     name: "Four of Pentacles",
@@ -993,7 +993,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Protecting your resources is prudent, but beware of allowing fear of loss to freeze your flow.",
     reversedMeaning: "Releasing financial anxiety, generosity, reckless spending, letting go.",
     keywords: ["security", "conservation", "stability", "attachment", "boundaries"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p04.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents04.jpg"
   },
   {
     name: "Five of Pentacles",
@@ -1007,7 +1007,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Temporary material or physical hardship. Look up: a warm sanctuary is open and ready to welcome you.",
     reversedMeaning: "Recovery from loss, financial turnaround, end of isolation, returning warmth.",
     keywords: ["hardship", "loss", "seeking help", "resilience", "sanctuary"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p05.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents05.jpg"
   },
   {
     name: "Six of Pentacles",
@@ -1021,7 +1021,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "The ethical flow of wealth. Give generously when abundant; receive gracefully when in need.",
     reversedMeaning: "Strings-attached charity, financial abuse, unpaid debts, power dynamics.",
     keywords: ["generosity", "charity", "reciprocity", "sharing", "balance"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p06.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents06.jpg"
   },
   {
     name: "Seven of Pentacles",
@@ -1035,7 +1035,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Pause to assess the progress of your seeds. Cultivation takes time; trust the maturation cycle.",
     reversedMeaning: "Impatience, poor returns, abandoned efforts, wasted investments.",
     keywords: ["patience", "investment", "growth", "assessment", "perseverance"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p07.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents07.jpg"
   },
   {
     name: "Eight of Pentacles",
@@ -1049,7 +1049,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Immerse yourself in meticulous practice and refinement. Mastery is built one deliberate stroke at a time.",
     reversedMeaning: "Perfectionism, cutting corners, meaningless drudgery, lack of discipline.",
     keywords: ["mastery", "craft", "discipline", "refinement", "dedication"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p08.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents08.jpg"
   },
   {
     name: "Nine of Pentacles",
@@ -1063,7 +1063,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Enjoy the exquisite fruits of your disciplined labor. Bask in sovereign comfort, elegance, and peace.",
     reversedMeaning: "Overspending, superficial lifestyle, loneliness despite wealth, dependency.",
     keywords: ["luxury", "self-reliance", "abundance", "grace", "fulfillment"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p09.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents09.jpg"
   },
   {
     name: "Ten of Pentacles",
@@ -1077,7 +1077,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Long-term security, established heritage, and permanent prosperity that nurtures future generations.",
     reversedMeaning: "Family financial feuds, loss of legacy, unstable foundations, burden of expectations.",
     keywords: ["legacy", "ancestry", "wealth", "tradition", "security"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p10.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents10.jpg"
   },
   {
     name: "Page of Pentacles",
@@ -1091,7 +1091,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "A grounded student eager to learn tangible skills and build practical foundations. Start your studies.",
     reversedMeaning: "Lack of focus, financial carelessness, procrastination, failing to ground dreams.",
     keywords: ["scholar", "opportunity", "study", "foundation", "diligence"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p11.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents11.jpg"
   },
   {
     name: "Knight of Pentacles",
@@ -1105,7 +1105,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Execute steadily without rushing. Patient, reliable discipline guarantees triumphant completion.",
     reversedMeaning: "Stubbornness, laziness, burnout from monotony, critical perfectionism.",
     keywords: ["perseverance", "reliability", "method", "discipline", "stewardship"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p12.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents12.jpg"
   },
   {
     name: "Queen of Pentacles",
@@ -1119,7 +1119,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Nurture your body, home, and finances with practical affection and warm, grounded hospitality.",
     reversedMeaning: "Neglecting health, workaholism, domestic neglect, over-materialism.",
     keywords: ["nurture", "hospitality", "prosperity", "sanctuary", "earth"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p13.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents13.jpg"
   },
   {
     name: "King of Pentacles",
@@ -1133,7 +1133,7 @@ export const TAROT_DATABASE: TarotCardData[] = [
     meaning: "Command your material kingdom with stability, financial acumen, and generous security.",
     reversedMeaning: "Greed, corruption, materialistic tyranny, stubborn conservatism.",
     keywords: ["mastery", "wealth", "stability", "success", "security"],
-    image: "https://raw.githubusercontent.com/ekg/tarot-api/master/static/cards/p14.jpg"
+    image: "https://cdn.jsdelivr.net/gh/mixvlad/TarotCards@master/tarot/rider-waite/720px/Pents14.jpg"
   }
 ];
 

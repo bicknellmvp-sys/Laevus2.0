@@ -1,22 +1,4 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { 
-  Search, 
-  Sparkles, 
-  X, 
-  Check, 
-  Plus, 
-  Layers, 
-  HelpCircle, 
-  Volume2, 
-  VolumeX, 
-  Loader2, 
-  RotateCcw,
-  Eye,
-  History,
-  ArrowRight,
-  BookOpen,
-  ChevronLeft
-} from 'lucide-react';
 import { metaphysicalConsultation } from '../services/gemini';
 import { voiceEngine, getSavedVoiceSettings, VoiceSettings } from '../services/voiceSynthesis';
 import { PastReadingsSidebar } from './PastReadingsSidebar';
@@ -27,6 +9,7 @@ import {
   PastSpreadSlotCard 
 } from '../services/pastReadingsStorage';
 import { TAROT_DATABASE } from '../data/tarotCards';
+import { SocialShareModal, ShareContent } from './SocialShareModal';
 
 export interface SpreadCard {
   name: string;
@@ -92,6 +75,45 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
   const [pastReadingsCount, setPastReadingsCount] = useState<number>(() => getPastSpreadReadings().length);
   const [activeArchivedReading, setActiveArchivedReading] = useState<PastSpreadReading | null>(null);
   const [activeReadingVoiceSettings, setActiveReadingVoiceSettings] = useState<VoiceSettings | null>(null);
+
+  // Social Sharing & Copy State
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareContent, setShareContent] = useState<ShareContent | null>(null);
+  const [copiedReading, setCopiedReading] = useState(false);
+
+  const handleCopyReading = async () => {
+    if (!generatedReading) return;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(generatedReading);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = generatedReading;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setCopiedReading(true);
+      setTimeout(() => setCopiedReading(false), 2000);
+    } catch (e) {
+      console.error('Copy reading failed', e);
+    }
+  };
+
+  const handleShareSpreadReading = () => {
+    if (!generatedReading) return;
+    const cardNames = [slots.slotA?.name, slots.slotB?.name, slots.slotC?.name, includeInsightCard ? slots.slotD?.name : null]
+      .filter(Boolean)
+      .join(', ');
+    const questionText = attachQuestion && customQuestion ? `"${customQuestion}"` : 'Physical Spread Inquiry';
+    setShareContent({
+      title: 'Spread Reading • LAEVUS',
+      text: `Physical Tarot Spread Reading on LAEVUS:\nFocus: ${questionText}\nCards: ${cardNames}\n\n${generatedReading.length > 250 ? generatedReading.substring(0, 250) + '...' : generatedReading}`,
+      category: 'tarot'
+    });
+    setShareModalOpen(true);
+  };
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchDropdownRef = useRef<HTMLDivElement>(null);
@@ -317,8 +339,8 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
       {/* Top Header */}
       <div className="border-b border-zinc-900 pb-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto">
         <div className="text-center sm:text-left">
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#E60026]/10 border border-[#E60026]/30 text-[#E60026] text-[10px] font-mono font-bold uppercase tracking-widest mb-1.5">
-            <Layers className="w-3 h-3" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#DC143C]/10 border border-[#DC143C]/30 text-[#DC143C] text-[10px] font-mono font-bold uppercase tracking-widest mb-1.5">
+            <span>✦</span>
             Physical Realm Spread Upload
           </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold font-syne text-[#F8F7F4] tracking-tight uppercase">
@@ -333,9 +355,9 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           {onReturnToChat && (
             <button
               onClick={onReturnToChat}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-[#E60026]/50 text-zinc-300 hover:text-white text-xs font-mono transition-all cursor-pointer shadow-md group"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-[#DC143C]/50 text-zinc-300 hover:text-white text-xs font-mono transition-all cursor-pointer shadow-md group"
             >
-              <ChevronLeft className="w-3.5 h-3.5 text-[#E60026] group-hover:-translate-x-0.5 transition-transform" />
+              <span className="text-[#DC143C] font-bold">←</span>
               <span className="font-bold uppercase tracking-wider text-[10px]">Return to Oracle Chat</span>
             </button>
           )}
@@ -343,12 +365,12 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           {/* Past Readings Sidebar Trigger */}
           <button
             onClick={() => setIsPastReadingsSidebarOpen(true)}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-black hover:bg-zinc-900 text-zinc-200 border border-zinc-800 hover:border-[#E60026] text-xs font-mono transition-all cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.5)] group flex-shrink-0"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-black hover:bg-zinc-900 text-zinc-200 border border-zinc-800 hover:border-[#DC143C] text-xs font-mono transition-all cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.5)] group flex-shrink-0"
             title="Open Past Spreads Sidebar to view historical interpretations"
           >
-            <History className="w-3.5 h-3.5 text-[#E60026] group-hover:rotate-[-20deg] transition-transform" />
+            <span className="text-[#DC143C] font-bold">⏱</span>
             <span className="font-bold uppercase tracking-wider text-[11px]">Past Spreads</span>
-            <span className="px-2 py-0.5 rounded-full bg-[#E60026] text-black text-[10px] font-extrabold font-mono">
+            <span className="px-2 py-0.5 rounded-full bg-[#DC143C] text-black text-[10px] font-extrabold font-mono">
               {pastReadingsCount}
             </span>
           </button>
@@ -359,9 +381,9 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
       <div className="max-w-xl mx-auto mb-8 relative z-30">
         <div className="flex items-center justify-between mb-1.5 px-1">
           <span className="text-[10px] uppercase font-mono tracking-widest font-bold text-zinc-400 flex items-center gap-1.5">
-            <Search className="w-3.5 h-3.5 text-[#E60026]" />
+            <span className="text-[#DC143C]">✦</span>
             Search to Fill Active Target:
-            <span className="text-[#E60026] font-bold">
+            <span className="text-[#DC143C] font-bold">
               {activeSlot === 'slotA' && 'CARD SLOT A (Past)'}
               {activeSlot === 'slotB' && 'CARD SLOT B (Present)'}
               {activeSlot === 'slotC' && 'CARD SLOT C (Future)'}
@@ -385,7 +407,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             }}
             onFocus={() => setIsSearchOpen(true)}
             placeholder="Type card name (e.g., The Moon, The Empress, High Priestess, Fool)..."
-            className="w-full bg-black border-2 border-zinc-850 focus:border-[#E60026] text-xs sm:text-sm px-4 py-3 rounded-xl text-zinc-100 placeholder-zinc-600 outline-none transition-all shadow-[0_4px_20px_rgba(0,0,0,0.8)] font-google-sans"
+            className="w-full bg-black border-2 border-zinc-850 focus:border-[#DC143C] text-xs sm:text-sm px-4 py-3 rounded-xl text-zinc-100 placeholder-zinc-600 outline-none transition-all shadow-[0_4px_20px_rgba(0,0,0,0.8)] font-google-sans"
           />
 
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
@@ -395,9 +417,9 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
                   setSearchQuery('');
                   searchInputRef.current?.focus();
                 }}
-                className="p-1 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+                className="p-1 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer text-xs"
               >
-                <X className="w-3.5 h-3.5" />
+                ✕
               </button>
             )}
             <div className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-400">
@@ -412,7 +434,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             <div className="fixed inset-0 z-20" onClick={() => setIsSearchOpen(false)} />
             <div
               ref={searchDropdownRef}
-              className="absolute left-0 right-0 top-full mt-2 bg-black border border-zinc-800 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.95)] max-h-72 overflow-y-auto z-30 p-2 border-t-2 border-t-[#E60026] animate-fadeIn"
+              className="absolute left-0 right-0 top-full mt-2 bg-black border border-zinc-800 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.95)] max-h-72 overflow-y-auto z-30 p-2 border-t-2 border-t-[#DC143C] animate-fadeIn"
             >
               <div className="px-2.5 py-1 text-[9px] font-mono text-zinc-500 uppercase tracking-wider border-b border-zinc-900 mb-1 flex justify-between">
                 <span>Matching Deck Entities</span>
@@ -442,7 +464,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs font-bold text-zinc-200 group-hover:text-[#E60026] transition-colors uppercase tracking-wider font-google-sans">
+                            <span className="text-xs font-bold text-zinc-200 group-hover:text-[#DC143C] transition-colors uppercase tracking-wider font-google-sans">
                               {card.name}
                             </span>
                             <span className="text-xs">{card.symbol}</span>
@@ -453,9 +475,9 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
                         </div>
                       </div>
 
-                      <div className="px-2.5 py-1 rounded bg-zinc-900 group-hover:bg-[#E60026] text-zinc-400 group-hover:text-black text-[10px] font-bold font-mono uppercase tracking-wider transition-all flex items-center gap-1">
+                      <div className="px-2.5 py-1 rounded bg-zinc-900 group-hover:bg-[#DC143C] text-zinc-400 group-hover:text-black text-[10px] font-bold font-mono uppercase tracking-wider transition-all flex items-center gap-1">
                         <span>Select</span>
-                        <Check className="w-2.5 h-2.5" />
+                        <span className="font-bold">✓</span>
                       </div>
                     </button>
                   ))}
@@ -474,7 +496,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           onClick={() => setActiveSlot('slotA')}
           className={`relative rounded-2xl p-4 transition-all duration-300 cursor-pointer flex flex-col items-center justify-between min-h-[310px] group ${
             activeSlot === 'slotA'
-              ? 'bg-zinc-950 border-2 border-[#E60026] shadow-[0_0_30px_rgba(230,0,38,0.25)] ring-1 ring-[#E60026]'
+              ? 'bg-zinc-950 border-2 border-[#DC143C] shadow-[0_0_30px_rgba(220,20,60,0.25)] ring-1 ring-[#DC143C]'
               : 'bg-black border border-zinc-900 hover:border-zinc-800 hover:bg-zinc-950/40'
           }`}
         >
@@ -482,7 +504,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           <div className="w-full flex items-center justify-between mb-2">
             <span className={`text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${
               activeSlot === 'slotA'
-                ? 'bg-[#E60026] text-black font-extrabold shadow-sm'
+                ? 'bg-[#DC143C] text-black font-extrabold shadow-sm'
                 : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
             }`}>
               {activeSlot === 'slotA' ? '● Active Target' : 'Card Slot A'}
@@ -493,7 +515,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           {/* Slot Content Preview */}
           {slots.slotA ? (
             <div className="w-full flex flex-col items-center animate-fadeIn">
-              <div className="w-full max-w-[140px] aspect-[2/3.1] rounded-xl overflow-hidden relative border border-zinc-800 shadow-[0_8px_25px_rgba(0,0,0,0.8)] mb-3 group-hover:border-[#E60026]/40 transition-colors">
+              <div className="w-full max-w-[140px] aspect-[2/3.1] rounded-xl overflow-hidden relative border border-zinc-800 shadow-[0_8px_25px_rgba(0,0,0,0.8)] mb-3 group-hover:border-[#DC143C]/40 transition-colors">
                 <img
                   src={slots.slotA.image}
                   alt={slots.slotA.name}
@@ -505,10 +527,10 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
                 
                 <button
                   onClick={(e) => handleClearSlot('slotA', e)}
-                  className="absolute top-2 right-2 p-1 bg-black/80 hover:bg-[#E60026] text-white hover:text-black rounded-full transition-colors cursor-pointer"
+                  className="absolute top-2 right-2 p-1 bg-black/80 hover:bg-[#DC143C] text-white hover:text-black rounded-full transition-colors cursor-pointer text-xs"
                   title="Clear card"
                 >
-                  <X className="w-3 h-3" />
+                  ✕
                 </button>
               </div>
 
@@ -523,10 +545,10 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             <div className="flex flex-col items-center justify-center flex-1 my-6 text-center space-y-3">
               <div className={`w-14 h-14 rounded-full border border-dashed flex items-center justify-center text-xl transition-all ${
                 activeSlot === 'slotA'
-                  ? 'border-[#E60026] text-[#E60026] bg-[#E60026]/10 animate-pulse'
+                  ? 'border-[#DC143C] text-[#DC143C] bg-[#DC143C]/10 animate-pulse'
                   : 'border-zinc-800 text-zinc-700'
               }`}>
-                <Eye className="w-6 h-6" />
+                <span className="text-base font-bold">○</span>
               </div>
               <div>
                 <span className="text-xs font-bold text-zinc-300 block uppercase tracking-wide">
@@ -549,14 +571,14 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           onClick={() => setActiveSlot('slotB')}
           className={`relative rounded-2xl p-4 transition-all duration-300 cursor-pointer flex flex-col items-center justify-between min-h-[310px] group ${
             activeSlot === 'slotB'
-              ? 'bg-zinc-950 border-2 border-[#E60026] shadow-[0_0_30px_rgba(230,0,38,0.25)] ring-1 ring-[#E60026]'
+              ? 'bg-zinc-950 border-2 border-[#DC143C] shadow-[0_0_30px_rgba(220,20,60,0.25)] ring-1 ring-[#DC143C]'
               : 'bg-black border border-zinc-900 hover:border-zinc-800 hover:bg-zinc-950/40'
           }`}
         >
           <div className="w-full flex items-center justify-between mb-2">
             <span className={`text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${
               activeSlot === 'slotB'
-                ? 'bg-[#E60026] text-black font-extrabold shadow-sm'
+                ? 'bg-[#DC143C] text-black font-extrabold shadow-sm'
                 : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
             }`}>
               {activeSlot === 'slotB' ? '● Active Target' : 'Card Slot B'}
@@ -566,7 +588,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
 
           {slots.slotB ? (
             <div className="w-full flex flex-col items-center animate-fadeIn">
-              <div className="w-full max-w-[140px] aspect-[2/3.1] rounded-xl overflow-hidden relative border border-zinc-800 shadow-[0_8px_25px_rgba(0,0,0,0.8)] mb-3 group-hover:border-[#E60026]/40 transition-colors">
+              <div className="w-full max-w-[140px] aspect-[2/3.1] rounded-xl overflow-hidden relative border border-zinc-800 shadow-[0_8px_25px_rgba(0,0,0,0.8)] mb-3 group-hover:border-[#DC143C]/40 transition-colors">
                 <img
                   src={slots.slotB.image}
                   alt={slots.slotB.name}
@@ -578,10 +600,10 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
                 
                 <button
                   onClick={(e) => handleClearSlot('slotB', e)}
-                  className="absolute top-2 right-2 p-1 bg-black/80 hover:bg-[#E60026] text-white hover:text-black rounded-full transition-colors cursor-pointer"
+                  className="absolute top-2 right-2 p-1 bg-black/80 hover:bg-[#DC143C] text-white hover:text-black rounded-full transition-colors cursor-pointer text-xs"
                   title="Clear card"
                 >
-                  <X className="w-3 h-3" />
+                  ✕
                 </button>
               </div>
 
@@ -596,10 +618,10 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             <div className="flex flex-col items-center justify-center flex-1 my-6 text-center space-y-3">
               <div className={`w-14 h-14 rounded-full border border-dashed flex items-center justify-center text-xl transition-all ${
                 activeSlot === 'slotB'
-                  ? 'border-[#E60026] text-[#E60026] bg-[#E60026]/10 animate-pulse'
+                  ? 'border-[#DC143C] text-[#DC143C] bg-[#DC143C]/10 animate-pulse'
                   : 'border-zinc-800 text-zinc-700'
               }`}>
-                <Eye className="w-6 h-6" />
+                <span className="text-base font-bold">○</span>
               </div>
               <div>
                 <span className="text-xs font-bold text-zinc-300 block uppercase tracking-wide">
@@ -622,14 +644,14 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           onClick={() => setActiveSlot('slotC')}
           className={`relative rounded-2xl p-4 transition-all duration-300 cursor-pointer flex flex-col items-center justify-between min-h-[310px] group ${
             activeSlot === 'slotC'
-              ? 'bg-zinc-950 border-2 border-[#E60026] shadow-[0_0_30px_rgba(230,0,38,0.25)] ring-1 ring-[#E60026]'
+              ? 'bg-zinc-950 border-2 border-[#DC143C] shadow-[0_0_30px_rgba(220,20,60,0.25)] ring-1 ring-[#DC143C]'
               : 'bg-black border border-zinc-900 hover:border-zinc-800 hover:bg-zinc-950/40'
           }`}
         >
           <div className="w-full flex items-center justify-between mb-2">
             <span className={`text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${
               activeSlot === 'slotC'
-                ? 'bg-[#E60026] text-black font-extrabold shadow-sm'
+                ? 'bg-[#DC143C] text-black font-extrabold shadow-sm'
                 : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
             }`}>
               {activeSlot === 'slotC' ? '● Active Target' : 'Card Slot C'}
@@ -639,7 +661,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
 
           {slots.slotC ? (
             <div className="w-full flex flex-col items-center animate-fadeIn">
-              <div className="w-full max-w-[140px] aspect-[2/3.1] rounded-xl overflow-hidden relative border border-zinc-800 shadow-[0_8px_25px_rgba(0,0,0,0.8)] mb-3 group-hover:border-[#E60026]/40 transition-colors">
+              <div className="w-full max-w-[140px] aspect-[2/3.1] rounded-xl overflow-hidden relative border border-zinc-800 shadow-[0_8px_25px_rgba(0,0,0,0.8)] mb-3 group-hover:border-[#DC143C]/40 transition-colors">
                 <img
                   src={slots.slotC.image}
                   alt={slots.slotC.name}
@@ -651,10 +673,10 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
                 
                 <button
                   onClick={(e) => handleClearSlot('slotC', e)}
-                  className="absolute top-2 right-2 p-1 bg-black/80 hover:bg-[#E60026] text-white hover:text-black rounded-full transition-colors cursor-pointer"
+                  className="absolute top-2 right-2 p-1 bg-black/80 hover:bg-[#DC143C] text-white hover:text-black rounded-full transition-colors cursor-pointer text-xs"
                   title="Clear card"
                 >
-                  <X className="w-3 h-3" />
+                  ✕
                 </button>
               </div>
 
@@ -669,10 +691,10 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             <div className="flex flex-col items-center justify-center flex-1 my-6 text-center space-y-3">
               <div className={`w-14 h-14 rounded-full border border-dashed flex items-center justify-center text-xl transition-all ${
                 activeSlot === 'slotC'
-                  ? 'border-[#E60026] text-[#E60026] bg-[#E60026]/10 animate-pulse'
+                  ? 'border-[#DC143C] text-[#DC143C] bg-[#DC143C]/10 animate-pulse'
                   : 'border-zinc-800 text-zinc-700'
               }`}>
-                <Eye className="w-6 h-6" />
+                <span className="text-base font-bold">○</span>
               </div>
               <div>
                 <span className="text-xs font-bold text-zinc-300 block uppercase tracking-wide">
@@ -696,14 +718,14 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             onClick={() => setActiveSlot('slotD')}
             className={`relative rounded-2xl p-4 transition-all duration-300 cursor-pointer flex flex-col items-center justify-between min-h-[310px] group animate-fadeIn ${
               activeSlot === 'slotD'
-                ? 'bg-zinc-950 border-2 border-[#E60026] shadow-[0_0_30px_rgba(230,0,38,0.25)] ring-1 ring-[#E60026]'
+                ? 'bg-zinc-950 border-2 border-[#DC143C] shadow-[0_0_30px_rgba(220,20,60,0.25)] ring-1 ring-[#DC143C]'
                 : 'bg-black border border-zinc-900 hover:border-zinc-800 hover:bg-zinc-950/40'
             }`}
           >
             <div className="w-full flex items-center justify-between mb-2">
               <span className={`text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${
                 activeSlot === 'slotD'
-                  ? 'bg-[#E60026] text-black font-extrabold shadow-sm'
+                  ? 'bg-[#DC143C] text-black font-extrabold shadow-sm'
                   : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
               }`}>
                 {activeSlot === 'slotD' ? '● Active Target' : 'Card Slot D'}
@@ -713,7 +735,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
 
             {slots.slotD ? (
               <div className="w-full flex flex-col items-center animate-fadeIn">
-                <div className="w-full max-w-[140px] aspect-[2/3.1] rounded-xl overflow-hidden relative border border-zinc-800 shadow-[0_8px_25px_rgba(0,0,0,0.8)] mb-3 group-hover:border-[#E60026]/40 transition-colors">
+                <div className="w-full max-w-[140px] aspect-[2/3.1] rounded-xl overflow-hidden relative border border-zinc-800 shadow-[0_8px_25px_rgba(0,0,0,0.8)] mb-3 group-hover:border-[#DC143C]/40 transition-colors">
                   <img
                     src={slots.slotD.image}
                     alt={slots.slotD.name}
@@ -725,47 +747,47 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
                   
                   <button
                     onClick={(e) => handleClearSlot('slotD', e)}
-                    className="absolute top-2 right-2 p-1 bg-black/80 hover:bg-[#E60026] text-white hover:text-black rounded-full transition-colors cursor-pointer"
+                    className="absolute top-2 right-2 p-1 bg-black/80 hover:bg-[#DC143C] text-white hover:text-black rounded-full transition-colors cursor-pointer text-xs"
                     title="Clear card"
                   >
-                    <X className="w-3 h-3" />
+                    ✕
                   </button>
                 </div>
 
-                <h3 className="text-xs font-bold font-syne uppercase tracking-wider text-zinc-100 text-center">
-                  {slots.slotD.name}
-                </h3>
-                <p className="text-[9.5px] text-zinc-400 text-center mt-1 line-clamp-2 px-1">
-                  {slots.slotD.meaning}
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center flex-1 my-6 text-center space-y-3">
-                <div className={`w-14 h-14 rounded-full border border-dashed flex items-center justify-center text-xl transition-all ${
-                  activeSlot === 'slotD'
-                    ? 'border-[#E60026] text-[#E60026] bg-[#E60026]/10 animate-pulse'
-                    : 'border-zinc-800 text-zinc-700'
-                }`}>
-                  <Sparkles className="w-6 h-6 text-amber-500/80" />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-zinc-300 block uppercase tracking-wide">
-                    Insight Slot Empty
-                  </span>
-                  <span className="text-[10px] text-zinc-500 mt-0.5 block">
-                    Search above to assign card
-                  </span>
-                </div>
-              </div>
-            )}
-
-            <div className="w-full pt-3 border-t border-zinc-900/60 text-center text-[9px] font-mono text-amber-500/80">
-              {slots.slotD ? '✓ 4th Dimension Key Assigned' : 'Awaiting Insight Card'}
+              <h3 className="text-xs font-bold font-syne uppercase tracking-wider text-zinc-100 text-center">
+                {slots.slotD.name}
+              </h3>
+              <p className="text-[9.5px] text-zinc-400 text-center mt-1 line-clamp-2 px-1">
+                {slots.slotD.meaning}
+              </p>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="flex flex-col items-center justify-center flex-1 my-6 text-center space-y-3">
+              <div className={`w-14 h-14 rounded-full border border-dashed flex items-center justify-center text-xl transition-all ${
+                activeSlot === 'slotD'
+                  ? 'border-[#DC143C] text-[#DC143C] bg-[#DC143C]/10 animate-pulse'
+                  : 'border-zinc-800 text-zinc-700'
+              }`}>
+                <span className="text-base font-bold text-amber-500/80">✦</span>
+              </div>
+              <div>
+                <span className="text-xs font-bold text-zinc-300 block uppercase tracking-wide">
+                  Insight Slot Empty
+                </span>
+                <span className="text-[10px] text-zinc-500 mt-0.5 block">
+                  Search above to assign card
+                </span>
+              </div>
+            </div>
+          )}
 
-      </div>
+          <div className="w-full pt-3 border-t border-zinc-900/60 text-center text-[9px] font-mono text-amber-500/80">
+            {slots.slotD ? '✓ 4th Dimension Key Assigned' : 'Awaiting Insight Card'}
+          </div>
+        </div>
+      )}
+
+    </div>
 
       {/* DYNAMIC CHECKBOXES & OPTIONS (Below Card Slots) */}
       <div className="bg-black border border-zinc-900 rounded-2xl p-5 mb-8 space-y-4 shadow-xl">
@@ -777,16 +799,16 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             onClick={() => setAttachQuestion(!attachQuestion)}
             className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
               attachQuestion 
-                ? 'bg-zinc-950 border-[#E60026]/50 shadow-[0_0_15px_rgba(230,0,38,0.1)]' 
+                ? 'bg-zinc-950 border-[#DC143C]/50 shadow-[0_0_15px_rgba(220,20,60,0.1)]' 
                 : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-800'
             }`}
           >
-            <div className={`w-5 h-5 rounded mt-0.5 flex items-center justify-center border transition-all ${
+            <div className={`w-5 h-5 rounded mt-0.5 flex items-center justify-center border transition-all text-xs font-bold ${
               attachQuestion 
-                ? 'bg-[#E60026] border-[#E60026] text-black' 
+                ? 'bg-[#DC143C] border-[#DC143C] text-white' 
                 : 'border-zinc-700 bg-zinc-900'
             }`}>
-              {attachQuestion && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              {attachQuestion && '✓'}
             </div>
 
             <div>
@@ -810,16 +832,16 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             }}
             className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
               includeInsightCard 
-                ? 'bg-zinc-950 border-[#E60026]/50 shadow-[0_0_15px_rgba(230,0,38,0.1)]' 
+                ? 'bg-zinc-950 border-[#DC143C]/50 shadow-[0_0_15px_rgba(220,20,60,0.1)]' 
                 : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-800'
             }`}
           >
-            <div className={`w-5 h-5 rounded mt-0.5 flex items-center justify-center border transition-all ${
+            <div className={`w-5 h-5 rounded mt-0.5 flex items-center justify-center border transition-all text-xs font-bold ${
               includeInsightCard 
-                ? 'bg-[#E60026] border-[#E60026] text-black' 
+                ? 'bg-[#DC143C] border-[#DC143C] text-white' 
                 : 'border-zinc-700 bg-zinc-900'
             }`}>
-              {includeInsightCard && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              {includeInsightCard && '✓'}
             </div>
 
             <div>
@@ -837,7 +859,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
         {/* Dynamic Revealed Input for Question */}
         {attachQuestion && (
           <div className="pt-2 animate-fadeIn">
-            <label className="text-[10px] uppercase font-mono tracking-widest text-[#E60026] font-bold block mb-1.5">
+            <label className="text-[10px] uppercase font-mono tracking-widest text-[#DC143C] font-bold block mb-1.5">
               Specify Querent Inquiry:
             </label>
             <input
@@ -845,7 +867,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
               value={customQuestion}
               onChange={(e) => setCustomQuestion(e.target.value)}
               placeholder="e.g. What unseen karmic obstacles surround my creative or romantic endeavor?"
-              className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#E60026] text-xs px-3.5 py-2.5 rounded-lg text-zinc-200 outline-none font-google-sans placeholder-zinc-700 shadow-inner"
+              className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#DC143C] text-xs px-3.5 py-2.5 rounded-lg text-zinc-200 outline-none font-google-sans placeholder-zinc-700 shadow-inner"
             />
           </div>
         )}
@@ -858,7 +880,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           onClick={handleResetAll}
           className="text-xs font-mono uppercase text-zinc-500 hover:text-zinc-300 flex items-center gap-1.5 transition-colors cursor-pointer self-center"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
+          <span>↺</span>
           Clear Spread Slots
         </button>
 
@@ -867,18 +889,18 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           disabled={!isReadyToProceed || isSynthesizing}
           className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer font-syne ${
             isReadyToProceed && !isSynthesizing
-              ? 'bg-[#E60026] hover:bg-[#ff334b] text-black shadow-[0_4px_25px_rgba(230,0,38,0.3)] hover:scale-[1.02]'
+              ? 'bg-[#DC143C] hover:bg-[#B81132] text-white shadow-[0_4px_25px_rgba(220,20,60,0.3)] hover:scale-[1.02]'
               : 'bg-zinc-900 text-zinc-700 cursor-not-allowed border border-zinc-850'
           }`}
         >
           {isSynthesizing ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               <span>Weaving Metaphysical Tapestry...</span>
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4 fill-current" />
+              <span className="text-[#F8F7F4]">✦</span>
               <span>Proceed with Spread Reading (Mode 2)</span>
             </>
           )}
@@ -887,14 +909,14 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
 
       {/* GENERATED READING DISPLAY */}
       {generatedReading && (
-        <div className="bg-zinc-950 border-2 border-[#E60026]/40 rounded-2xl p-6 shadow-[0_10px_50px_rgba(0,0,0,0.8)] relative animate-fadeIn space-y-4">
+        <div className="bg-zinc-950 border-2 border-[#DC143C]/40 rounded-2xl p-6 shadow-[0_10px_50px_rgba(0,0,0,0.8)] relative animate-fadeIn space-y-4">
           
           {/* Active Archived Reading Badge / Voice Conductor info */}
           {activeArchivedReading && (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-xl bg-black border border-[#E60026]/40 text-xs font-mono">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-xl bg-black border border-[#DC143C]/40 text-xs font-mono">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#E60026] animate-ping" />
-                <span className="text-[#E60026] font-bold">
+                <span className="w-2 h-2 rounded-full bg-[#DC143C] animate-ping" />
+                <span className="text-[#DC143C] font-bold">
                   Viewing Archived Spread: {activeArchivedReading.formattedDate}
                 </span>
               </div>
@@ -911,14 +933,14 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             </div>
           )}
 
-          <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-900 pb-3">
             <div className="flex items-center gap-2">
               <span className="text-xl">🕯️</span>
               <div>
                 <h3 className="text-base font-bold font-syne uppercase tracking-wider text-[#F8F7F4]">
                   Physical Realm Reading Synthesis
                 </h3>
-                <span className="text-[9px] font-mono text-[#E60026]">
+                <span className="text-[9px] font-mono text-[#DC143C]">
                   {activeArchivedReading 
                     ? 'Archived Interpretation with Original Vocal Modulation' 
                     : 'Full Narrative Tapestry Generated'}
@@ -926,44 +948,64 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
               </div>
             </div>
 
-            {/* Audio Voice Playback Control (Plays using original voice settings) */}
-            <button
-              onClick={handleToggleVoicePlayback}
-              className={`px-3.5 py-1.5 rounded-lg border text-xs font-mono uppercase flex items-center gap-1.5 transition-all cursor-pointer ${
-                isAudioSpeaking
-                  ? 'bg-[#E60026] text-black border-[#E60026] font-bold shadow-md animate-pulse'
-                  : 'bg-black text-zinc-300 border-zinc-800 hover:border-[#E60026]/40'
-              }`}
-              title={activeArchivedReading ? `Listen with ${activeArchivedReading.voiceSettings.persona} original settings` : 'Listen to voice synthesis'}
-            >
-              {isAudioSpeaking ? (
-                <>
-                  <VolumeX className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Copy Reading Button */}
+              <button
+                onClick={handleCopyReading}
+                className={`px-3 py-1.5 rounded-lg border text-xs font-mono uppercase flex items-center gap-1.5 transition-all cursor-pointer ${
+                  copiedReading
+                    ? 'bg-emerald-600 text-white border-emerald-500 font-bold'
+                    : 'bg-black text-zinc-300 border-zinc-800 hover:border-[#DC143C]/50 hover:text-white'
+                }`}
+                title="Copy reading text to clipboard"
+              >
+                <span>{copiedReading ? '✓' : '📋'}</span>
+                <span>{copiedReading ? 'Copied' : 'Copy'}</span>
+              </button>
+
+              {/* Share Reading Button */}
+              <button
+                onClick={handleShareSpreadReading}
+                className="px-3 py-1.5 rounded-lg border text-xs font-mono uppercase flex items-center gap-1.5 transition-all cursor-pointer bg-black text-zinc-300 border-zinc-800 hover:border-[#DC143C]/50 hover:text-white"
+                title="Share reading on social media"
+              >
+                <span>↗</span>
+                <span>Share</span>
+              </button>
+
+              {/* Audio Voice Playback Control (Plays using original voice settings) */}
+              <button
+                onClick={handleToggleVoicePlayback}
+                className={`px-3.5 py-1.5 rounded-lg border text-xs font-mono uppercase flex items-center gap-1.5 transition-all cursor-pointer ${
+                  isAudioSpeaking
+                    ? 'bg-[#DC143C] text-white border-[#DC143C] font-bold shadow-md animate-pulse'
+                    : 'bg-black text-zinc-300 border-zinc-800 hover:border-[#DC143C]/40'
+                }`}
+                title={activeArchivedReading ? `Listen with ${activeArchivedReading.voiceSettings.persona} original settings` : 'Listen to voice synthesis'}
+              >
+                {isAudioSpeaking ? (
                   <span>Mute Voice</span>
-                </>
-              ) : (
-                <>
-                  <Volume2 className="w-3.5 h-3.5 text-[#E60026]" />
+                ) : (
                   <span>
                     {activeArchivedReading 
                       ? `Listen (${activeArchivedReading.voiceSettings.persona.split(' ')[0]})` 
                       : 'Listen to Voice'}
                   </span>
-                </>
-              )}
-            </button>
+                )}
+              </button>
+            </div>
           </div>
 
-          <div className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-google-sans whitespace-pre-wrap pl-2 border-l-2 border-[#E60026]">
+          <div className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-google-sans whitespace-pre-wrap pl-2 border-l-2 border-[#DC143C] select-text">
             {generatedReading}
           </div>
 
           <div className="pt-3 border-t border-zinc-900 flex items-center justify-between text-[10px] font-mono text-zinc-500">
             <button
               onClick={() => setIsPastReadingsSidebarOpen(true)}
-              className="text-[#E60026] hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-[#DC143C] hover:underline flex items-center gap-1 cursor-pointer"
             >
-              <History className="w-3 h-3" />
+              <span>⏱</span>
               <span>Browse All {pastReadingsCount} Past Spreads in Sidebar →</span>
             </button>
 
@@ -981,6 +1023,13 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
         onClose={() => setIsPastReadingsSidebarOpen(false)}
         onSelectReading={handleSelectPastReading}
         currentLoadedReadingId={activeArchivedReading?.id || null}
+      />
+
+      {/* Social Media Sharing Modal */}
+      <SocialShareModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        content={shareContent}
       />
 
     </div>

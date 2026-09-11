@@ -4,16 +4,10 @@ import { voiceEngine } from '../services/voiceSynthesis';
 import { db } from '../services/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { User } from 'firebase/auth';
-import { 
-  Sparkles, 
-  Send, 
-  Compass, 
-  X, 
-  ChevronLeft
-} from 'lucide-react';
 import { TarotEncyclopedia } from './TarotEncyclopedia';
 import { DivinationHub } from './DivinationHub';
 import { AccountHub, TranscriptRecord } from './AccountHub';
+import { SocialShareModal, ShareContent } from './SocialShareModal';
 import { TAROT_DATABASE, TarotCardData as UniversalTarotCardData } from '../data/tarotCards';
 
 interface Message {
@@ -195,8 +189,8 @@ const RunicSigilOverlay: React.FC<{ text: string; isDone: boolean }> = ({ text, 
 
       <svg 
         viewBox="0 0 200 200" 
-        className="w-full h-full text-[#E60026]"
-        style={{ filter: 'drop-shadow(0 0 5px rgba(230,0,38,0.45))' }}
+        className="w-full h-full text-[#DC143C]"
+        style={{ filter: 'drop-shadow(0 0 5px rgba(220,20,60,0.45))' }}
       >
         <defs>
           <filter id="sigil-glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -434,7 +428,7 @@ const TypewriterText: React.FC<{ text: string }> = ({ text }) => {
             href={token.url} 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="text-[#E60026] hover:underline font-bold transition-all relative z-20 inline-flex items-center gap-0.5"
+            className="text-[#DC143C] hover:underline font-bold transition-all relative z-20 inline-flex items-center gap-0.5"
           >
             {token.text}
           </a>
@@ -499,6 +493,51 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
   // Sentiment Analysis and Transcripts state
   const [sentimentScores, setSentimentScores] = useState<number[]>([35, 45, 40, 60, 50]);
   const [transcripts, setTranscripts] = useState<TranscriptRecord[]>([]);
+
+  // Social Share & Copy state
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareContent, setShareContent] = useState<ShareContent | null>(null);
+
+  const handleCopyText = async (text: string, id?: string) => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      if (id) {
+        setCopiedMessageId(id);
+        setTimeout(() => setCopiedMessageId(null), 2000);
+      }
+    } catch (e) {
+      console.error('Failed to copy', e);
+    }
+  };
+
+  const handleShareOracleMessage = (text: string) => {
+    setShareContent({
+      title: 'Oracle Guidance • LAEVUS',
+      text: `Oracle Reflection from LAEVUS:\n"${text.length > 280 ? text.substring(0, 280) + '...' : text}"`,
+      category: 'oracle'
+    });
+    setShareModalOpen(true);
+  };
+
+  const handleShareTarotReading = (question: string, cards: TarotCard[]) => {
+    const cardsSummary = cards.map(c => `${c.position}: ${c.name}`).join(' | ');
+    setShareContent({
+      title: 'Tarot Divination • LAEVUS',
+      text: `My Tarot Reading on LAEVUS:\nQuestion: "${question || 'Personal guidance'}"\nCards: ${cardsSummary}`,
+      category: 'tarot'
+    });
+    setShareModalOpen(true);
+  };
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const currentUserRef = useRef<User | null>(null);
@@ -721,10 +760,10 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
 
   const loadDefaultWelcome = () => {
     const WELCOME_PHRASES = [
-      "Ah, come in, sit down, child! Don't just stand there letting all the good energy out the doorway. What weighing thoughts have brought you to my table today?",
-      "The scrying mirror flickers to life, darling. Sit down, catch your breath, and tell Madame Blavatsky what heavy karmic threads or modern troubles you wish to untangle.",
-      "Ah, welcome back to the circle, child. The unseen currents in the Astral Light are active today. Pull up a chair—what has left you flummoxed?",
-      "Do not sit there doomscrolling through past worries, darling! I am Madame Blavatsky. Speak your mind, clear your head, and let us see what the unseen realm reveals."
+      "Welcome. Take a breath and make yourself comfortable. What's on your mind today?",
+      "Good to see you. Pull up a chair and let me know what you'd like clarity or insight on.",
+      "Welcome to LAEVUS. Whether you have questions about personal growth, work, relationships, or decisions ahead, I'm here to listen and help you talk it through. What are you working through right now?",
+      "Welcome back. Take your time, clear your head, and let's explore whatever questions or thoughts you've brought with you today."
     ];
 
     let indexStr = sessionStorage.getItem('laevus_welcome_index');
@@ -1189,7 +1228,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                 onClick={handleReleaseTarotPersona}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-900 text-amber-400 text-[9px] uppercase hover:bg-amber-500/10 transition-colors cursor-pointer border border-transparent font-google-sans"
               >
-                <X className="w-2.5 h-2.5" />
+                ✕
                 <span className="font-google-sans">Depart</span>
               </button>
             </div>
@@ -1207,7 +1246,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                    <span className="text-[8px] text-zinc-500 mb-1 px-1 tracking-wider uppercase font-google-sans">
                      {isUser ? 'YOU' : activeTarotPersona ? activeTarotPersona.toUpperCase() : 'MADAME BLAVATSKY'} • {m.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                    </span>
-                   <div className={`px-4 py-3 rounded-xl leading-relaxed text-xs ${
+                   <div className={`px-4 py-3 rounded-xl leading-relaxed text-xs select-text ${
                      isUser 
                        ? 'bg-zinc-900 text-[#F8F7F4]' 
                        : 'bg-zinc-950 text-[#F8F7F4] w-full border border-zinc-900/50'
@@ -1218,14 +1257,34 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                        <TypewriterText text={m.text} />
                      )}
                    </div>
+
+                   {/* Action buttons: Copy & Share */}
+                   <div className="flex items-center gap-1.5 mt-1 px-1 opacity-80 hover:opacity-100 transition-opacity">
+                     <button
+                       onClick={() => handleCopyText(m.text, m.id)}
+                       className="text-[9px] font-mono text-zinc-500 hover:text-zinc-200 transition-colors cursor-pointer flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-900 hover:border-zinc-800"
+                       title="Copy text to clipboard"
+                     >
+                       <span>{copiedMessageId === m.id ? '✓' : '📋'}</span>
+                       <span>{copiedMessageId === m.id ? 'Copied' : 'Copy'}</span>
+                     </button>
+                     <button
+                       onClick={() => handleShareOracleMessage(m.text)}
+                       className="text-[9px] font-mono text-zinc-500 hover:text-[#DC143C] transition-colors cursor-pointer flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-900 hover:border-zinc-800"
+                       title="Share to social media"
+                     >
+                       <span>↗</span>
+                       <span>Share</span>
+                     </button>
+                   </div>
                  </div>
                );
             })}
             
             {isTyping && (
               <div className="flex items-center gap-2 mr-auto bg-zinc-950 px-4 py-3 rounded-xl w-full border border-zinc-900/50">
-                <Compass className="w-3.5 h-3.5 text-[#E60026] animate-spin" />
-                <span className="text-[9px] text-zinc-500 uppercase tracking-widest animate-pulse font-google-sans">Consulting the unseen...</span>
+                <span className="w-2 h-2 rounded-full bg-[#DC143C] animate-ping" />
+                <span className="text-[9px] text-zinc-500 uppercase tracking-widest animate-pulse font-google-sans">Reflecting on your thoughts...</span>
               </div>
             )}
             <div ref={chatEndRef} />
@@ -1250,7 +1309,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
             </div>
             
             {/* Text input form */}
-            <div className="relative flex items-center rounded-lg bg-zinc-950 focus-within:ring-1 focus-within:ring-[#E60026]/40 transition-all p-1.5">
+            <div className="relative flex items-center rounded-lg bg-zinc-950 focus-within:ring-1 focus-within:ring-[#DC143C]/40 transition-all p-1.5">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -1270,11 +1329,11 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                 disabled={!input.trim() || isTyping}
                 className={`p-2.5 rounded-lg transition-all ${
                   input.trim() && !isTyping
-                    ? 'bg-[#E60026] hover:bg-[#ff334b] text-black cursor-pointer'
-                    : 'bg-zinc-900 text-zinc-700 cursor-not-allowed'
+                    ? 'bg-[#DC143C] hover:bg-[#B81132] text-white cursor-pointer font-bold text-xs'
+                    : 'bg-zinc-900 text-zinc-700 cursor-not-allowed text-xs'
                 }`}
               >
-                <Send className="w-3.5 h-3.5" />
+                Send
               </button>
             </div>
           </div>
@@ -1314,16 +1373,16 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
 
       {/* VIEW: 3-CARD TAROT ORACLE */}
       {activeView === 'tarot' && (
-        <div className="p-3 sm:p-4 mb-2 relative animate-fadeIn space-y-4 w-full max-w-3xl mx-auto flex-1 flex flex-col justify-center min-h-0">
+        <div className="p-3 sm:p-4 mb-2 pt-2 sm:pt-4 relative animate-fadeIn space-y-4 w-full max-w-3xl mx-auto flex-1 flex flex-col justify-center min-h-0">
           <div className="border-b border-zinc-900/40 pb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] uppercase tracking-widest text-[#E60026] font-bold block font-google-sans">Tarot Sanctuary</span>
+                <span className="text-[10px] uppercase tracking-widest text-[#DC143C] font-bold block font-google-sans">Tarot Sanctuary</span>
                 <button
                   onClick={() => setActiveView('chat')}
                   className="flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-[9px] font-mono transition-colors uppercase cursor-pointer border border-zinc-800"
                 >
-                  <ChevronLeft className="w-2.5 h-2.5 text-[#E60026]" />
+                  <span className="text-[#DC143C]">←</span>
                   <span>Oracle Chat</span>
                 </button>
               </div>
@@ -1337,7 +1396,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                 disabled={isDrawing}
                 className={`px-3 py-1 text-[9px] uppercase tracking-wider font-bold rounded-md transition-all ${
                   tarotMode === 'digital'
-                    ? 'bg-[#E60026] text-black shadow-md'
+                    ? 'bg-[#DC143C] text-white shadow-md'
                     : 'text-zinc-500 hover:text-zinc-300 cursor-pointer'
                 }`}
               >
@@ -1348,7 +1407,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                 disabled={isDrawing}
                 className={`px-3 py-1 text-[9px] uppercase tracking-wider font-bold rounded-md transition-all ${
                   tarotMode === 'physical'
-                    ? 'bg-[#E60026] text-black shadow-md'
+                    ? 'bg-[#DC143C] text-white shadow-md'
                     : 'text-zinc-500 hover:text-zinc-300 cursor-pointer'
                 }`}
               >
@@ -1366,7 +1425,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                 onChange={(e) => setTarotQuestion(e.target.value)}
                 disabled={isDrawing}
                 placeholder="e.g. What secrets await my journey in this upcoming eclipse?"
-                className="w-full bg-zinc-950 border border-zinc-900 focus:border-[#E60026] text-xs px-3 py-2.5 rounded-lg text-zinc-300 outline-none font-google-sans placeholder-zinc-850 shadow-md"
+                className="w-full bg-zinc-950 border border-zinc-900 focus:border-[#DC143C] text-xs px-3 py-2.5 rounded-lg text-zinc-300 outline-none font-google-sans placeholder-zinc-850 shadow-md"
               />
             </div>
 
@@ -1382,7 +1441,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                           className="w-full max-w-[145px] sm:max-w-[165px] mx-auto"
                         >
                           {isFlipped ? (
-                            <div className="relative overflow-hidden aspect-[2/3.1] rounded-xl border border-zinc-800/60 flex flex-col justify-between items-center bg-black group hover:scale-[1.05] transition-all duration-300 shadow-[0_8px_30px_rgba(0,0,0,0.8)] hover:border-[#E60026]/40">
+                            <div className="relative overflow-hidden aspect-[2/3.1] rounded-xl border border-zinc-800/60 flex flex-col justify-between items-center bg-black group hover:scale-[1.05] transition-all duration-300 shadow-[0_8px_30px_rgba(0,0,0,0.8)] hover:border-[#DC143C]/40">
                               <img 
                                 src={card.image} 
                                 alt={card.name} 
@@ -1392,7 +1451,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                               <div className="absolute inset-1.5 border border-amber-500/20 rounded-lg pointer-events-none z-10 shadow-[inset_0_0_12px_rgba(0,0,0,0.6)] group-hover:border-amber-500/40 transition-colors" />
                               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/70 z-10 pointer-events-none" />
                               <div className="relative z-20 pt-2.5 flex flex-col items-center">
-                                <span className="text-[7px] text-[#E60026] uppercase font-mono tracking-widest font-bold bg-black/85 border border-[#E60026]/30 px-2 py-0.5 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
+                                <span className="text-[7px] text-[#DC143C] uppercase font-mono tracking-widest font-bold bg-black/85 border border-[#DC143C]/30 px-2 py-0.5 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
                                   {card.position}
                                 </span>
                               </div>
@@ -1408,12 +1467,12 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                               </div>
                             </div>
                           ) : (
-                            <div className="relative overflow-hidden aspect-[2/3.1] rounded-xl border border-zinc-900 bg-zinc-950 flex flex-col items-center justify-center p-3 text-center cursor-pointer group hover:border-[#E60026]/50 hover:shadow-[0_0_20px_rgba(230,0,38,0.15)] transition-all duration-300 shadow-[inset_0_1px_4px_rgba(255,255,255,0.01)]">
+                            <div className="relative overflow-hidden aspect-[2/3.1] rounded-xl border border-zinc-900 bg-zinc-950 flex flex-col items-center justify-center p-3 text-center cursor-pointer group hover:border-[#DC143C]/50 hover:shadow-[0_0_20px_rgba(220,20,60,0.15)] transition-all duration-300 shadow-[inset_0_1px_4px_rgba(255,255,255,0.01)]">
                               <div className="absolute inset-1.5 border border-zinc-800/40 rounded-lg pointer-events-none" />
-                              <div className="absolute inset-0 bg-[radial-gradient(#E60026_1px,transparent_1px)] bg-[size:7px_7px] opacity-[0.18] rounded-lg group-hover:opacity-[0.3] transition-opacity" />
+                              <div className="absolute inset-0 bg-[radial-gradient(#DC143C_1px,transparent_1px)] bg-[size:7px_7px] opacity-[0.18] rounded-lg group-hover:opacity-[0.3] transition-opacity" />
                               <div className="absolute w-12 h-12 rounded-full border border-dashed border-zinc-800/50 animate-[spin_15s_linear_infinite]" />
                               <div className="absolute w-16 h-16 rounded-full border border-dotted border-zinc-900/80 animate-[spin_30s_linear_infinite] pointer-events-none" />
-                              <div className="w-9 h-9 rounded-full border border-zinc-850 flex items-center justify-center text-zinc-400 group-hover:text-[#ff334b] group-hover:border-[#E60026]/40 transition-all shadow-[inset_0_1px_3px_rgba(255,255,255,0.01)] text-base relative z-10 bg-zinc-950">
+                              <div className="w-9 h-9 rounded-full border border-zinc-850 flex items-center justify-center text-zinc-400 group-hover:text-[#DC143C] group-hover:border-[#DC143C]/40 transition-all shadow-[inset_0_1px_3px_rgba(255,255,255,0.01)] text-base relative z-10 bg-zinc-950">
                                 👁️
                               </div>
                             </div>
@@ -1424,12 +1483,36 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                   </div>
                 )}
 
+                {drawnCards.length === 3 && flippedCount === 3 && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1 animate-fadeIn">
+                    <button
+                      onClick={() => handleShareTarotReading(tarotQuestion, drawnCards)}
+                      className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-black border border-zinc-800 hover:border-[#DC143C]/50 text-xs font-mono uppercase text-zinc-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                      title="Share reading on social media"
+                    >
+                      <span>↗</span>
+                      <span>Share Reading</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        const summary = `Three-Card Tarot Reading on LAEVUS:\nQuestion: "${tarotQuestion || 'Personal guidance'}"\n` + drawnCards.map(c => `${c.position}: ${c.name} - ${c.description}`).join('\n');
+                        handleCopyText(summary, 'tarot-reading-summary');
+                      }}
+                      className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-black border border-zinc-800 hover:border-[#DC143C]/50 text-xs font-mono uppercase text-zinc-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                      title="Copy reading summary"
+                    >
+                      <span>{copiedMessageId === 'tarot-reading-summary' ? '✓' : '📋'}</span>
+                      <span>{copiedMessageId === 'tarot-reading-summary' ? 'Copied' : 'Copy Summary'}</span>
+                    </button>
+                  </div>
+                )}
+
                 <button
                   onClick={handleDrawTarot}
                   disabled={isDrawing || !tarotQuestion.trim()}
                   className={`w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer font-google-sans ${
                     tarotQuestion.trim() && !isDrawing
-                      ? 'bg-[#E60026] text-black hover:bg-[#ff334b]'
+                      ? 'bg-[#DC143C] text-white hover:bg-[#B81132]'
                       : 'bg-zinc-950 text-zinc-800 cursor-not-allowed border border-zinc-900/50'
                   }`}
                 >
@@ -1445,7 +1528,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                       value={physicalPastCard}
                       onChange={(e) => setPhysicalPastCard(e.target.value)}
                       disabled={isDrawing}
-                      className="bg-zinc-950 border border-zinc-900 text-zinc-300 text-xs rounded-lg px-3 py-2.5 outline-none w-full font-google-sans focus:border-[#E60026] cursor-pointer"
+                      className="bg-zinc-950 border border-zinc-900 text-zinc-300 text-xs rounded-lg px-3 py-2.5 outline-none w-full font-google-sans focus:border-[#DC143C] cursor-pointer"
                     >
                       <option value="">Select Card...</option>
                       <optgroup label="── Major Arcana ──">
@@ -1472,7 +1555,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                       value={physicalPresentCard}
                       onChange={(e) => setPhysicalPresentCard(e.target.value)}
                       disabled={isDrawing}
-                      className="bg-zinc-950 border border-zinc-900 text-zinc-300 text-xs rounded-lg px-3 py-2.5 outline-none w-full font-google-sans focus:border-[#E60026] cursor-pointer"
+                      className="bg-zinc-950 border border-zinc-900 text-zinc-300 text-xs rounded-lg px-3 py-2.5 outline-none w-full font-google-sans focus:border-[#DC143C] cursor-pointer"
                     >
                       <option value="">Select Card...</option>
                       <optgroup label="── Major Arcana ──">
@@ -1499,7 +1582,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                       value={physicalFutureCard}
                       onChange={(e) => setPhysicalFutureCard(e.target.value)}
                       disabled={isDrawing}
-                      className="bg-zinc-950 border border-zinc-900 text-zinc-300 text-xs rounded-lg px-3 py-2.5 outline-none w-full font-google-sans focus:border-[#E60026] cursor-pointer"
+                      className="bg-zinc-950 border border-zinc-900 text-zinc-300 text-xs rounded-lg px-3 py-2.5 outline-none w-full font-google-sans focus:border-[#DC143C] cursor-pointer"
                     >
                       <option value="">Select Card...</option>
                       <optgroup label="── Major Arcana ──">
@@ -1543,7 +1626,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
         <div className="flex flex-col sm:flex-row justify-center items-center w-full gap-2">
           <button 
             onClick={() => setShowAboutModal(true)}
-            className="hover:text-[#E60026] text-center transition-colors duration-300 focus:outline-none cursor-pointer border-b border-transparent hover:border-[#E60026]/40 pb-0.5 font-bold bg-zinc-950 px-3 py-1.5 rounded font-google-sans"
+            className="hover:text-[#DC143C] text-center transition-colors duration-300 focus:outline-none cursor-pointer border-b border-transparent hover:border-[#DC143C]/40 pb-0.5 font-bold bg-zinc-950 px-3 py-1.5 rounded font-google-sans"
           >
             All rights reserved "Left Hand Products LLC" 2026
           </button>
@@ -1552,45 +1635,45 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
 
       {/* ESOTERIC ABOUT US MODAL */}
       {showAboutModal && (
-        <div className="fixed inset-0 bg-zinc-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4 select-none animate-fadeIn">
+        <div className="fixed inset-0 bg-zinc-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4 select-text animate-fadeIn">
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl max-w-lg w-full p-6 relative shadow-2xl text-center font-google-sans">
             
             <button 
               onClick={() => setShowAboutModal(false)}
-              className="absolute top-4 right-4 text-zinc-600 hover:text-[#E60026] transition-colors cursor-pointer"
+              className="absolute top-4 right-4 text-zinc-600 hover:text-[#DC143C] transition-colors cursor-pointer text-base font-bold"
             >
-              <X className="w-4 h-4" />
+              ✕
             </button>
 
             <div className="flex justify-center mb-4">
-              <div className="w-12 h-12 rounded-full bg-[#E60026]/10 border border-[#E60026]/30 flex items-center justify-center text-xl text-[#E60026]">
+              <div className="w-12 h-12 rounded-full bg-[#DC143C]/10 border border-[#DC143C]/30 flex items-center justify-center text-xl text-[#DC143C]">
                 👁️
               </div>
             </div>
 
             <h3 className="font-google-sans text-sm sm:text-base font-extrabold uppercase tracking-[0.1em] text-[#F8F7F4] mb-3">
-              ✦ THE SYSTEM ✦
+              ✦ ABOUT ME ✦
             </h3>
             
-            <div className="text-left font-google-sans text-[10px] sm:text-[11px] text-zinc-400 leading-relaxed space-y-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-thin">
+            <div className="text-left font-google-sans text-xs sm:text-[12px] text-zinc-300 leading-relaxed space-y-3.5 max-h-[350px] overflow-y-auto pr-2 scrollbar-thin select-text">
               <p>
-                I, <span className="text-[#F8F7F4] font-bold">Andrew Bicknell</span>, founder and operator of <a href="https://theleft.one" target="_blank" rel="noopener noreferrer" className="font-ruthie text-base sm:text-lg text-zinc-300 hover:text-white inline-flex items-center gap-1 transition-colors mx-1">the<span className="text-[#E60026]">left</span>.one</a> and <span className="text-[#F8F7F4] font-bold">Left Hand Products, LLC</span>, am a person of intricate layers.
+                Hi, I'm <span className="text-[#F8F7F4] font-bold">Andrew Bicknell</span>, founder of <a href="https://theleft.one" target="_blank" rel="noopener noreferrer" className="font-syne font-bold text-xs sm:text-sm text-zinc-200 hover:text-white inline-flex items-center gap-0.5 transition-colors mx-1">the<span className="text-[#DC143C]">left</span>.one</a> and <span className="text-[#F8F7F4] font-bold">Left Hand Products, LLC</span>.
               </p>
               
               <p>
-                As an entrepreneur and business major, I expanded my horizons into the digital landscape—learning to write code, master modern technologies, and harness the latent power of artificial intelligence to architect systems that manifest my exact vision.
+                My background is in business and entrepreneurship. Over the years, I taught myself to code and embraced modern AI technologies so I could build the software ideas and creative platforms I'm passionate about from the ground up.
               </p>
               
               <p>
-                The multi-faceted nature of my journey extends far deeper than the screen. I celebrate traditional, warm seasonal observances like Christmas and Easter alongside the cyclical, ancient rhythms of Pagan holidays. To me, these traditions are not in direct conflict with one another; it is merely human artifice that strives to make them so.
+                Outside of building software, I have a genuine appreciation for diverse traditions. I enjoy celebrating holidays like Christmas and Easter with family just as much as observing the natural turning of the seasons and Pagan holidays. To me, celebrating life and connection doesn't require boxing yourself into just one tradition.
               </p>
 
               <p>
-                In my lifelong pursuit of esoteric knowledge, I have deeply investigated western hermeticism, spiritual cybernetics, and Left-Hand Path Gnosticism. While I do not consider myself a rigid follower or active practitioner of any single occult school, some ancient, unconventional ways have resonated within me since long before I ever discovered the formal dark arts.
+                I've also spent years reading and exploring esoteric philosophy, hermetic traditions, and unconventional ideas. I don't subscribe rigidly to any one dogma—I just have an open mind and a deep curiosity for history, symbolism, and how people throughout history have sought meaning.
               </p>
 
               <p>
-                Today, I live happily on our family's beautiful estate in Fountain, Colorado, sharing this chapter of life with my sister Candace, my nephew Noah, and my favorite feline companion and familiar, Tiger Lily Woods.
+                Today, I live on our family's property in Fountain, Colorado, enjoying life alongside my sister Candace, my nephew Noah, and my cat Tiger Lily Woods.
               </p>
 
               <p className="border-t border-zinc-800/50 pt-3 text-[9px] text-zinc-600 italic">
@@ -1601,7 +1684,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
             <div className="mt-6 font-google-sans">
               <button
                 onClick={() => setShowAboutModal(false)}
-                className="w-full py-2.5 bg-[#E60026] hover:bg-[#ff334b] text-[#111113] font-bold text-xs uppercase tracking-widest rounded-lg transition-colors cursor-pointer font-google-sans"
+                className="w-full py-2.5 bg-[#DC143C] hover:bg-[#B81132] text-white font-bold text-xs uppercase tracking-widest rounded-lg transition-colors cursor-pointer font-google-sans"
               >
                 RETURN TO CHAT
               </button>
@@ -1610,6 +1693,13 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
           </div>
         </div>
       )}
+
+      {/* Social Media Sharing Modal */}
+      <SocialShareModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        content={shareContent}
+      />
 
     </div>
   );

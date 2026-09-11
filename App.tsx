@@ -77,7 +77,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="h-screen bg-transparent text-[#F8F7F4] selection:bg-[#E60026]/20 selection:text-[#E60026] overflow-x-hidden overflow-y-auto relative flex flex-col pb-2 font-mono">
+    <div className="h-screen bg-transparent text-[#F8F7F4] selection:bg-[#DC143C]/20 selection:text-[#DC143C] overflow-x-hidden overflow-y-auto relative flex flex-col pb-2 font-mono">
       
       {/* Centered Content Container */}
       <div className="flex-1 flex flex-col w-full relative z-10">
@@ -92,7 +92,7 @@ const App: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <span className="font-syne font-extrabold text-[#F8F7F4] tracking-tight">LAEVUS</span>
                   <span className="text-zinc-600">|</span>
-                  <span className="text-[10px] text-[#E60026] uppercase font-bold tracking-wider">
+                  <span className="text-[10px] text-[#DC143C] uppercase font-bold tracking-wider">
                     {activeView === 'divination' ? 'Divination Sanctuary' : activeView === 'account' ? 'Account Hub' : activeView === 'encyclopedia' ? 'Living Tarot Encyclopedia' : activeView === 'tarot' ? '3-Card Oracle' : activeView}
                   </span>
                 </div>
@@ -101,7 +101,7 @@ const App: React.FC = () => {
                     href={`${window.location.origin}/?view=${activeView}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] text-zinc-400 hover:text-[#E60026] transition-colors flex items-center gap-1"
+                    className="text-[10px] text-zinc-400 hover:text-[#DC143C] transition-colors flex items-center gap-1"
                   >
                     <span>Full Sanctuary ↗</span>
                   </a>
@@ -111,7 +111,7 @@ const App: React.FC = () => {
                     rel="noopener noreferrer"
                     className="text-sm font-ruthie text-zinc-400 hover:text-white"
                   >
-                    the<span className="text-[#E60026]">left</span>.one
+                    the<span className="text-[#DC143C]">left</span>.one
                   </a>
                 </div>
               </div>

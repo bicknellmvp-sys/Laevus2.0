@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import React, { useCallback, useState, useEffect } from 'react';
-import { ArrowUpTrayIcon, SparklesIcon, CpuChipIcon } from '@heroicons/react/24/outline';
 
 interface InputAreaProps {
   onGenerate: (prompt: string, file?: File) => void;
@@ -35,7 +34,7 @@ const CyclingText = () => {
     }, [words.length]);
 
     return (
-        <span className={`inline-block whitespace-nowrap transition-all duration-500 transform ${fade ? 'opacity-100 translate-y-0 blur-0' : 'opacity-0 translate-y-2 blur-sm'} text-[#F8F7F4] font-medium pb-1 border-b-2 border-[#E60026]/60`}>
+        <span className={`inline-block whitespace-nowrap transition-all duration-500 transform ${fade ? 'opacity-100 translate-y-0 blur-0' : 'opacity-0 translate-y-2 blur-sm'} text-[#F8F7F4] font-medium pb-1 border-b-2 border-[#DC143C]/60`}>
             {words[index]}
         </span>
     );
@@ -94,7 +93,7 @@ export const InputArea: React.FC<InputAreaProps> = ({ onGenerate, isGenerating, 
             cursor-pointer overflow-hidden
             transition-all duration-300
             ${isDragging 
-              ? 'border-[#E60026] bg-black/60 shadow-[inset_0_0_30px_rgba(230,0,38,0.15)]' 
+              ? 'border-[#DC143C] bg-black/60 shadow-[inset_0_0_30px_rgba(220,20,60,0.15)]' 
               : 'border-[#F8F7F4]/20 hover:border-[#F8F7F4]/60 hover:bg-black/20'
             }
             ${isGenerating ? 'pointer-events-none' : ''}
@@ -109,19 +108,17 @@ export const InputArea: React.FC<InputAreaProps> = ({ onGenerate, isGenerating, 
             </div>
             
             {/* Corner Brackets with Metaphysical Accent */}
-            <div className={`absolute top-4 left-4 w-4 h-4 border-l-2 border-t-2 transition-colors duration-300 ${isDragging ? 'border-[#E60026]' : 'border-zinc-700'}`}></div>
-            <div className={`absolute top-4 right-4 w-4 h-4 border-r-2 border-t-2 transition-colors duration-300 ${isDragging ? 'border-[#E60026]' : 'border-zinc-700'}`}></div>
-            <div className={`absolute bottom-4 left-4 w-4 h-4 border-l-2 border-b-2 transition-colors duration-300 ${isDragging ? 'border-[#E60026]' : 'border-zinc-700'}`}></div>
-            <div className={`absolute bottom-4 right-4 w-4 h-4 border-r-2 border-b-2 transition-colors duration-300 ${isDragging ? 'border-[#E60026]' : 'border-zinc-700'}`}></div>
+            <div className={`absolute top-4 left-4 w-4 h-4 border-l-2 border-t-2 transition-colors duration-300 ${isDragging ? 'border-[#DC143C]' : 'border-zinc-700'}`}></div>
+            <div className={`absolute top-4 right-4 w-4 h-4 border-r-2 border-t-2 transition-colors duration-300 ${isDragging ? 'border-[#DC143C]' : 'border-zinc-700'}`}></div>
+            <div className={`absolute bottom-4 left-4 w-4 h-4 border-l-2 border-b-2 transition-colors duration-300 ${isDragging ? 'border-[#DC143C]' : 'border-zinc-700'}`}></div>
+            <div className={`absolute bottom-4 right-4 w-4 h-4 border-r-2 border-b-2 transition-colors duration-300 ${isDragging ? 'border-[#DC143C]' : 'border-zinc-700'}`}></div>
  
             <div className="relative z-10 flex flex-col items-center text-center space-y-6 md:space-y-8 p-6 md:p-8 w-full">
                 <div className={`relative w-16 h-16 md:w-20 md:h-20 flex items-center justify-center transition-transform duration-500 ${isDragging ? 'scale-110' : 'group-hover:-translate-y-1'}`}>
                     <div className={`absolute inset-0 bg-black border border-zinc-800 shadow-xl flex items-center justify-center ${isGenerating ? 'animate-pulse' : ''}`}>
-                        {isGenerating ? (
-                            <CpuChipIcon className="w-8 h-8 md:w-10 md:h-10 text-[#E60026] animate-spin-slow" />
-                        ) : (
-                            <ArrowUpTrayIcon className={`w-8 h-8 md:w-10 md:h-10 text-zinc-400 transition-all duration-300 ${isDragging ? '-translate-y-1 text-[#E60026]' : 'group-hover:text-[#E60026]'}`} />
-                        )}
+                        <span className="font-mono text-xs text-[#DC143C] font-bold">
+                          {isGenerating ? "PROCESSING" : "UPLOAD"}
+                        </span>
                     </div>
                 </div>
  
@@ -138,7 +135,7 @@ export const InputArea: React.FC<InputAreaProps> = ({ onGenerate, isGenerating, 
                         Drag & drop a file, or click below
                     </p>
                     
-                    <div className="mt-4 border-2 border-[#F8F7F4] text-[#F8F7F4] group-hover:bg-[#E60026] group-hover:text-[#111113] group-hover:border-[#E60026] transition-all duration-300 px-8 py-3.5 inline-block font-bold tracking-wider text-xs sm:text-sm uppercase font-mono shadow-md">
+                    <div className="mt-4 border-2 border-[#F8F7F4] text-[#F8F7F4] group-hover:bg-[#DC143C] group-hover:text-white group-hover:border-[#DC143C] transition-all duration-300 px-8 py-3.5 inline-block font-bold tracking-wider text-xs sm:text-sm uppercase font-mono shadow-md">
                         {isGenerating ? "COMMUNING WITH CODE..." : "BEGIN THE CONSULTATION"}
                     </div>
                 </div>

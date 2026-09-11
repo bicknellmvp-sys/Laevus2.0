@@ -28,7 +28,7 @@ export const TarotCard: React.FC<TarotCardProps> = ({ card, isReversed = false, 
           setFlipped(!flipped);
           if (onSelect) onSelect(card);
         }}
-        className={`relative w-72 h-[480px] bg-[#131313] border-2 border-[#e60026] rounded-xl p-4 shadow-2xl cursor-pointer transition-transform duration-500 transform ${
+        className={`relative w-72 h-[480px] bg-[#131313] border-2 border-[#dc143c] rounded-xl p-4 shadow-2xl cursor-pointer transition-transform duration-500 transform ${
           isReversed ? 'rotate-180' : ''
         } hover:scale-[1.02] group`}
       >
@@ -37,7 +37,7 @@ export const TarotCard: React.FC<TarotCardProps> = ({ card, isReversed = false, 
           
           {/* Top Header: Roman Numeral / Card Number & Astrology/Suit Badge */}
           <div className="flex items-center justify-between z-10">
-            <span className="font-['Bodoni_Moda'] text-[#e60026] tracking-widest text-lg font-bold">
+            <span className="font-['Bodoni_Moda'] text-[#dc143c] tracking-widest text-lg font-bold">
               {card.number}
             </span>
             <span className="text-[10px] uppercase font-['Inter'] tracking-wider text-zinc-400 bg-black/70 px-2 py-0.5 rounded border border-zinc-800">
@@ -62,9 +62,9 @@ export const TarotCard: React.FC<TarotCardProps> = ({ card, isReversed = false, 
               </div>
             ) : (
               <>
-                <div className="w-16 h-16 rounded-full border border-[#e60026] flex items-center justify-center mb-3 bg-black/50 shadow-[0_0_15px_rgba(230,0,38,0.2)]">
-                  <span className="material-symbols-outlined text-[#e60026] text-3xl">
-                    {card.arcana === 'major' ? 'auto_awesome' : 'style'}
+                <div className="w-16 h-16 rounded-full border border-[#dc143c] flex items-center justify-center mb-3 bg-black/50 shadow-[0_0_15px_rgba(220,20,60,0.2)]">
+                  <span className="text-[#dc143c] text-xs font-mono font-bold">
+                    {card.arcana === 'major' ? 'ARCANA' : 'SUIT'}
                   </span>
                 </div>
                 <p className="font-['Inter'] text-xs text-[#e0e0e0]/80 italic px-2">
@@ -75,12 +75,12 @@ export const TarotCard: React.FC<TarotCardProps> = ({ card, isReversed = false, 
           </div>
 
           {/* Bottom Footer: Card Title */}
-          <div className="text-center pt-2 border-t border-[#e60026]/50 z-10">
+          <div className="text-center pt-2 border-t border-[#dc143c]/50 z-10">
             <h2 className="font-['Bodoni_Moda'] text-[#e0e0e0] font-bold text-lg uppercase tracking-wider">
               {card.name}
             </h2>
             {card.suit && card.suit !== 'major' && (
-              <p className="font-['Inter'] text-[11px] text-[#e60026] tracking-widest uppercase mt-0.5 font-medium">
+              <p className="font-['Inter'] text-[11px] text-[#dc143c] tracking-widest uppercase mt-0.5 font-medium">
                 Suit of {card.suit}
               </p>
             )}
@@ -91,14 +91,14 @@ export const TarotCard: React.FC<TarotCardProps> = ({ card, isReversed = false, 
       {/* Meanings & Keywords Display */}
       <div className="w-full bg-[#131313] border border-[#e0e0e0]/20 rounded-lg p-4 font-['Inter'] text-[#e0e0e0] text-sm shadow-lg">
         <div className="mb-3">
-          <span className="text-[#e60026] font-semibold text-xs uppercase tracking-wider block mb-1">
+          <span className="text-[#dc143c] font-semibold text-xs uppercase tracking-wider block mb-1">
             Upright Meaning & Keywords:
           </span>
           <p className="text-xs text-zinc-300 mb-1.5 leading-relaxed">{card.meaning}</p>
           <p className="text-[#e0e0e0]/90 text-xs font-mono">{uprightList.join(' • ')}</p>
         </div>
         <div className="pt-2 border-t border-zinc-900">
-          <span className="text-[#e60026]/80 font-semibold text-xs uppercase tracking-wider block mb-1">
+          <span className="text-[#dc143c]/80 font-semibold text-xs uppercase tracking-wider block mb-1">
             Reversed Meaning & Shadow:
           </span>
           <p className="text-xs text-zinc-400 mb-1.5 leading-relaxed">{card.reversedMeaning}</p>

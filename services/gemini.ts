@@ -10,7 +10,14 @@ const GEMINI_MODEL = 'gemini-3.1-pro-preview';
 const getApiKey = (): string => {
   try {
     // Dynamically retrieve client-side keys injected by Vercel / Netlify
-    return import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBDPVz2Y145lx76jHtf0Jvd_KWZl_KA5FY";
+    return (
+      import.meta.env.VITE_GEMINI_API_KEY ||
+      import.meta.env.GEMINI_API_KEY ||
+      import.meta.env.VITE_FIREBASE_API_KEY ||
+      import.meta.env.FIREBASE_API_KEY ||
+      (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) ||
+      "AIzaSyBDPVz2Y145lx76jHtf0Jvd_KWZl_KA5FY"
+    );
   } catch (e) {
     return "AIzaSyBDPVz2Y145lx76jHtf0Jvd_KWZl_KA5FY";
   }

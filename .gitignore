@@ -1,4 +1,3 @@
-```gitignore
 # Dependencies
 node_modules/
 
@@ -100,4 +99,3 @@ coverage/
 *.pyc
 *.pyo
 *.pyd
-```

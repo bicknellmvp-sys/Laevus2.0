@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
         allowedHosts: true,
       },
       plugins: [react()],
+      envPrefix: ['VITE_', 'FIREBASE_', 'GEMINI_'],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY || ''),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || '')

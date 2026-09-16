@@ -1,55 +1,41 @@
 import React, { useState } from 'react';
+import { ThreeCardOracle, TarotCard } from './ThreeCardOracle';
 import { TarotEncyclopedia } from './TarotEncyclopedia';
 import { UploadSpread } from './UploadSpread';
 
 interface DivinationHubProps {
-  initialTab?: 'oracle' | 'upload' | 'encyclopedia';
+  initialTab?: 'oracle' | 'offline-spread' | 'encyclopedia';
   onReturnToChat: () => void;
   onStartSeanceWithCard?: (cardName: string, promptQuestion?: string) => void;
-  onSelectTarotReadMode?: (mode: 'digital' | 'physical', question: string, past?: string, present?: string, future?: string) => void;
-  onLaunchThreeCardDraw?: () => void;
+  onStartReading?: (prompt: string, mode: 'tarot' | 'tarot-physical', cards: TarotCard[]) => void;
+  onShareTarotReading?: (question: string, cards: TarotCard[]) => void;
 }
 
 export const DivinationHub: React.FC<DivinationHubProps> = ({
   initialTab = 'oracle',
   onReturnToChat,
   onStartSeanceWithCard,
-  onLaunchThreeCardDraw
+  onStartReading,
+  onShareTarotReading
 }) => {
-  const [activeTab, setActiveTab] = useState<'oracle' | 'upload' | 'encyclopedia'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'oracle' | 'offline-spread' | 'encyclopedia'>(initialTab);
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex-1 flex flex-col min-h-0 relative font-google-sans text-zinc-300 animate-fadeIn pt-2 sm:pt-4">
+    <div className="w-full max-w-5xl mx-auto flex-1 flex flex-col min-h-0 relative font-google-sans text-zinc-300 animate-fadeIn pt-1 sm:pt-2">
       
       {/* Top Header & Tab Navigation Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-900/60 pb-4 mb-5 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onReturnToChat}
-            className="flex items-center gap-1.5 px-3 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-mono transition-colors uppercase cursor-pointer border border-zinc-800"
-            title="Return to Oracle Chat"
-          >
-            <span className="text-[#DC143C] font-bold">←</span>
-            <span>Chat</span>
-          </button>
-          <div>
-            <h2 className="text-base sm:text-lg font-syne font-extrabold text-[#F8F7F4] tracking-tight uppercase flex items-center gap-2">
-              <span>Divination Sanctuary</span>
-              <span className="text-[10px] font-mono font-bold text-[#DC143C] bg-[#DC143C]/10 px-2 py-0.5 rounded border border-[#DC143C]/25">
-                UNIFIED REALM
-              </span>
-            </h2>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-900/60 pb-3 mb-4 flex-shrink-0">
+        <div>
+          <h2 className="text-sm sm:text-base font-bold italic text-zinc-300 tracking-wide uppercase">
+            Divination
+          </h2>
         </div>
 
-        {/* Tab Selection Switcher */}
+        {/* Tab Selection Switcher in exact layout sequence */}
         <div className="flex bg-zinc-950 p-1 rounded-xl border border-zinc-900/80 shadow-inner self-start sm:self-auto gap-1">
           <button
-            onClick={() => {
-              setActiveTab('oracle');
-              if (onLaunchThreeCardDraw) onLaunchThreeCardDraw();
-            }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+            onClick={() => setActiveTab('oracle')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
               activeTab === 'oracle'
                 ? 'bg-[#DC143C] text-black shadow-md'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
@@ -59,19 +45,19 @@ export const DivinationHub: React.FC<DivinationHubProps> = ({
           </button>
 
           <button
-            onClick={() => setActiveTab('upload')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-              activeTab === 'upload'
+            onClick={() => setActiveTab('offline-spread')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+              activeTab === 'offline-spread'
                 ? 'bg-[#DC143C] text-black shadow-md'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
             }`}
           >
-            <span>Spread Upload</span>
+            <span>Offline Spread</span>
           </button>
 
           <button
             onClick={() => setActiveTab('encyclopedia')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
               activeTab === 'encyclopedia'
                 ? 'bg-[#DC143C] text-black shadow-md'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
@@ -82,9 +68,20 @@ export const DivinationHub: React.FC<DivinationHubProps> = ({
         </div>
       </div>
 
-      {/* Tab Contents */}
-      <div className="flex-1 min-h-0 flex flex-col">
-        {activeTab === 'upload' && (
+      {/* Tab Contents with fast subtle transitions */}
+      <div className="flex-1 min-h-0 flex flex-col transition-all duration-200">
+        {activeTab === 'oracle' && (
+          <ThreeCardOracle 
+            onStartReading={(prompt, mode, cards) => {
+              if (onStartReading) {
+                onStartReading(prompt, mode, cards);
+              }
+            }}
+            onShareTarotReading={onShareTarotReading}
+          />
+        )}
+
+        {activeTab === 'offline-spread' && (
           <UploadSpread 
             onReturnToChat={onReturnToChat}
             onCompleteReading={() => {}}
@@ -106,3 +103,4 @@ export const DivinationHub: React.FC<DivinationHubProps> = ({
     </div>
   );
 };
+

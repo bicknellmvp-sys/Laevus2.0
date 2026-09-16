@@ -431,20 +431,6 @@ export const PastReadingsSidebar: React.FC<PastReadingsSidebarProps> = ({
 
                         {/* Revisit / Load to Main View */}
                         <div className="flex items-center gap-1.5">
-                          
-                          {/* Copy Reading Content */}
-                          <button
-                            onClick={(e) => handleCopyText(reading, e)}
-                            className="px-2 py-1 text-xs text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors cursor-pointer font-mono"
-                            title="Copy full reading transcription"
-                          >
-                            {copiedId === reading.id ? (
-                              <span className="text-green-400 font-bold">✓ Copied</span>
-                            ) : (
-                              <span>Copy</span>
-                            )}
-                          </button>
-
                           {/* Toggle Expand Interpretation */}
                           <button
                             onClick={() => setExpandedReadingId(isExpanded ? null : reading.id)}
@@ -518,7 +504,7 @@ export const PastReadingsSidebar: React.FC<PastReadingsSidebarProps> = ({
                               Voice: {reading.voiceSettings.persona}
                             </span>
                           </div>
-                          <div className="text-xs text-zinc-300 leading-relaxed font-google-sans whitespace-pre-wrap pl-2.5 border-l-2 border-[#DC143C]">
+                          <div className="text-xs text-zinc-300 leading-relaxed font-google-sans whitespace-pre-wrap pl-2.5 border-l-2 border-[#DC143C] select-text cursor-text">
                             {reading.readingText}
                           </div>
                         </div>

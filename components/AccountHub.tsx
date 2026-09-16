@@ -99,24 +99,11 @@ export const AccountHub: React.FC<AccountHubProps> = ({
     <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col min-h-0 relative font-google-sans text-zinc-300 animate-fadeIn p-2 sm:p-4 pt-2 sm:pt-4">
       
       {/* Top Header & Tab Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-900/60 pb-4 mb-6 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onReturnToChat}
-            className="flex items-center gap-1.5 px-3 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-mono transition-colors uppercase cursor-pointer border border-zinc-800"
-            title="Return to Oracle Chat"
-          >
-            <span className="text-[#DC143C] font-bold">←</span>
-            <span>Chat</span>
-          </button>
-          <div>
-            <h2 className="text-base sm:text-lg font-syne font-extrabold text-[#F8F7F4] tracking-tight uppercase flex items-center gap-2">
-              <span>Account & Insights Hub</span>
-              <span className="text-[10px] font-mono font-bold text-[#DC143C] bg-[#DC143C]/10 px-2 py-0.5 rounded border border-[#DC143C]/25">
-                SOVEREIGN VESSEL
-              </span>
-            </h2>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-900/60 pb-3 mb-4 flex-shrink-0">
+        <div>
+          <h2 className="text-sm sm:text-base font-bold italic text-zinc-300 tracking-wide uppercase">
+            Account & Insights
+          </h2>
         </div>
 
         {/* Tab Selection Switcher */}

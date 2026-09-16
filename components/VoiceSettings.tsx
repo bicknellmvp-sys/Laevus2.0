@@ -4,6 +4,7 @@ import {
   getSavedVoiceSettings, 
   saveVoiceSettings, 
   PERSONA_PROFILES, 
+  PersonaId,
   voiceEngine 
 } from '../services/voiceSynthesis';
 
@@ -34,7 +35,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
     setTimeout(() => setSavedNotice(false), 1500);
   };
 
-  const handlePersonaSelect = (personaId: VoiceSettingsType['persona']) => {
+  const handlePersonaSelect = (personaId: PersonaId) => {
     const profile = PERSONA_PROFILES[personaId];
     const next: VoiceSettingsType = {
       ...settings,
@@ -56,12 +57,13 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
     }
   };
 
-  const handleResetDefaults = () => {
+  const handleResetSliders = () => {
     const profile = PERSONA_PROFILES[settings.persona];
     const next: VoiceSettingsType = {
       ...settings,
       pitch: profile.defaultPitch,
-      speed: profile.defaultSpeed
+      speed: profile.defaultSpeed,
+      affectIntensity: 0.85
     };
     setSettings(next);
     saveVoiceSettings(next);
@@ -69,177 +71,295 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
 
   const activeProfile = PERSONA_PROFILES[settings.persona] || PERSONA_PROFILES['Madame Blavatsky'];
 
+  const getAffectSampleQuote = (profile: typeof activeProfile, affect: number) => {
+    if (!profile.sampleQuotes) return profile.testPhrase;
+    if (affect >= 0.86) return profile.sampleQuotes.immersion;
+    if (affect >= 0.66) return profile.sampleQuotes.pronounced;
+    if (affect >= 0.40) return profile.sampleQuotes.balanced;
+    return profile.sampleQuotes.subtle;
+  };
+
+  // Four personas in exact 2x2 grid positions
+  const personaList: PersonaId[] = [
+    'Madame Blavatsky',        // Box 1 (Top-Left)
+    'Sophisticated Gentleman',  // Box 2 (Top-Right)
+    'Khan',                     // Box 3 (Bottom-Left)
+    'Marie'                     // Box 4 (Bottom-Right)
+  ];
+
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 my-2 animate-fadeIn font-google-sans text-zinc-200">
+    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 my-2 animate-fadeIn font-google-sans text-zinc-200 select-text">
       
       {/* Header Banner */}
       <div className="border-b border-zinc-900 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] uppercase font-mono tracking-widest text-[#DC143C] font-bold bg-[#DC143C]/10 px-2 py-0.5 rounded border border-[#DC143C]/30">
-              Aural Resonance Conduit
+            <span className="text-[10px] uppercase font-mono tracking-widest text-[#DC143C] font-bold">
+              Voice Persona
             </span>
             {savedNotice && (
-              <span className="text-[10px] font-mono text-emerald-400 animate-pulse">
-                ● Synchronized
+              <span className="text-[10px] font-mono text-emerald-400">
+                Saved
               </span>
             )}
           </div>
           <h2 className="text-xl sm:text-2xl font-bold font-syne text-[#F8F7F4] tracking-tight">
-            Esoteric Voice Synthesis Settings
+            Voice Settings
           </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
-            Configure vocal conduits, astral frequency pitches, and speech playback speed for all readings.
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Configure persona profiles, speech-to-text input, and audio export settings.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 self-start sm:self-center">
-          {onReturnToChat && (
-            <button
-              onClick={onReturnToChat}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-[#DC143C]/50 text-zinc-300 hover:text-white text-xs font-mono transition-all cursor-pointer shadow-md group"
-            >
-              <span className="text-[#DC143C] font-bold">←</span>
-              <span className="font-bold uppercase tracking-wider text-[10px]">Return to Oracle Chat</span>
-            </button>
-          )}
+        {/* Return to chat if handler supplied */}
+        {onReturnToChat && (
+          <button
+            onClick={onReturnToChat}
+            className="self-start sm:self-center px-3 py-1.5 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-xs font-mono uppercase tracking-wider text-zinc-300 rounded-lg transition-colors cursor-pointer"
+          >
+            Return
+          </button>
+        )}
+      </div>
 
-          {/* Global Master Audio Toggle */}
-          <div className="flex items-center gap-3 bg-black border border-zinc-900 rounded-xl p-2.5 shadow-lg">
-            <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${settings.enabled ? 'bg-[#DC143C] animate-pulse' : 'bg-zinc-700'}`} />
-              <div className="flex flex-col">
-                <span className="text-[9px] uppercase font-mono font-bold tracking-wider text-zinc-400">
-                  Audio Synthesis
-                </span>
-                <span className={`text-[11px] font-bold ${settings.enabled ? 'text-[#DC143C]' : 'text-zinc-600'}`}>
-                  {settings.enabled ? 'ENABLED' : 'MUTED'}
-                </span>
-              </div>
-            </div>
+      {/* TOP SECTION: Four Small Persona Selector Boxes (2x2 Grid) */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-300">
+            Voice Persona
+          </span>
+          <span className="text-[10px] font-mono text-zinc-500">
+            Active: {settings.persona}
+          </span>
+        </div>
 
-            <button
-              onClick={() => handleUpdate({ enabled: !settings.enabled })}
-              className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 cursor-pointer ${
-                settings.enabled ? 'bg-[#DC143C]' : 'bg-zinc-800'
-              }`}
-              aria-label="Toggle Audio Synthesis"
-            >
-              <div
-                className={`bg-black w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
-                  settings.enabled ? 'translate-x-6' : 'translate-x-0'
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {personaList.map((id, index) => {
+            const profile = PERSONA_PROFILES[id];
+            const isSelected = settings.persona === id;
+
+            return (
+              <button
+                key={id}
+                onClick={() => handlePersonaSelect(id)}
+                className={`p-4 rounded-xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between ${
+                  isSelected
+                    ? 'bg-zinc-950 border-[#DC143C] shadow-[0_0_15px_rgba(220,20,60,0.15)] ring-1 ring-[#DC143C]/50'
+                    : 'bg-black border-zinc-900 hover:border-zinc-800 hover:bg-zinc-950/60'
                 }`}
-              />
-            </button>
-          </div>
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+                      Box {index + 1}
+                    </span>
+                    {isSelected && (
+                      <span className="text-[9px] font-mono uppercase px-2 py-0.5 rounded bg-[#DC143C]/20 border border-[#DC143C]/40 text-[#DC143C] font-bold">
+                        Selected
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className={`text-sm font-bold font-syne uppercase tracking-wider ${
+                    isSelected ? 'text-white' : 'text-zinc-200'
+                  }`}>
+                    {profile.title}
+                  </h3>
+
+                  <div className="text-[11px] font-mono text-[#DC143C] mt-1 font-medium">
+                    {profile.accent}
+                  </div>
+
+                  <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+                    {profile.description}
+                  </p>
+                </div>
+
+                <div className="mt-3 pt-2.5 border-t border-zinc-900/60 flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                  <span>Pitch: {profile.defaultPitch.toFixed(2)}x</span>
+                  <span>Cadence: {profile.defaultSpeed.toFixed(2)}x</span>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* BOTTOM SECTION: One Larger Container for Audio Settings, Controls, STT, and Disclaimers */}
+      <div className="bg-black border border-zinc-900 rounded-2xl p-5 sm:p-7 space-y-6 shadow-2xl">
         
-        {/* Left Column: Persona Conduits Selection */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 font-bold flex items-center gap-1.5">
-              <span className="text-[#DC143C]">✦</span>
-              Select Voice Persona
-            </span>
-            <span className="text-[10px] font-mono text-zinc-600">4 Conduits Available</span>
+        {/* Section 1: Master Audio Synthesis Toggle & Test */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-zinc-900">
+          <div>
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-200">
+              Audio Synthesis Status
+            </div>
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Controls spoken audio delivery for oracle conversations and readings.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {Object.values(PERSONA_PROFILES).map((profile) => {
-              const isSelected = settings.persona === profile.id;
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => handleUpdate({ enabled: !settings.enabled })}
+              className={`px-4 py-2 rounded-lg font-mono text-xs uppercase font-bold tracking-wider transition-colors cursor-pointer border ${
+                settings.enabled
+                  ? 'bg-[#DC143C] text-white border-[#DC143C]'
+                  : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-zinc-200'
+              }`}
+            >
+              {settings.enabled ? 'Audio Enabled' : 'Audio Muted'}
+            </button>
+
+            <button
+              onClick={handleTestVoice}
+              disabled={!settings.enabled}
+              className={`px-4 py-2 rounded-lg font-mono text-xs uppercase font-bold tracking-wider transition-colors cursor-pointer border ${
+                !settings.enabled
+                  ? 'bg-zinc-950 text-zinc-700 border-zinc-900 cursor-not-allowed'
+                  : isSpeaking
+                  ? 'bg-zinc-900 text-[#DC143C] border-[#DC143C]'
+                  : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border-zinc-800'
+              }`}
+            >
+              {isSpeaking ? 'Stop Voice' : 'Test Voice'}
+            </button>
+          </div>
+        </div>
+
+        {/* Section 2: Affect (How Much) - Persona Accent & Standout Intensity */}
+        <div className="space-y-4 pb-5 border-b border-zinc-900">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-200">
+                  Affect (How Much)
+                </span>
+                <span className="text-[10px] font-mono text-[#DC143C] font-semibold tracking-wide">
+                  Standout Factor
+                </span>
+              </div>
+              <p className="text-xs text-zinc-400 mt-0.5">
+                Adjusts how intensely the persona's accent, vernacular, cadence, and worldview stand out in dialogue and spoken audio.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <span className="text-xs font-mono font-bold text-[#DC143C] bg-zinc-950 px-2.5 py-1 rounded border border-zinc-800">
+                {Math.round(settings.affectIntensity * 100)}%
+              </span>
+              <span className="text-[10px] font-mono uppercase text-zinc-400 tracking-wider">
+                {settings.affectIntensity >= 0.86
+                  ? 'Full Immersion'
+                  : settings.affectIntensity >= 0.66
+                  ? 'Pronounced'
+                  : settings.affectIntensity >= 0.40
+                  ? 'Balanced'
+                  : 'Subtle'}
+              </span>
+            </div>
+          </div>
+
+          {/* Slider */}
+          <div className="space-y-2">
+            <input
+              type="range"
+              min="0.2"
+              max="1.0"
+              step="0.05"
+              value={settings.affectIntensity}
+              onChange={(e) => handleUpdate({ affectIntensity: parseFloat(e.target.value) })}
+              className="w-full accent-[#DC143C] bg-zinc-900 h-1.5 rounded-lg appearance-none cursor-pointer"
+            />
+            <div className="flex justify-between text-[9px] font-mono text-zinc-600 uppercase">
+              <span>20% Subtle Nuance</span>
+              <span>50% Balanced</span>
+              <span>75% Pronounced</span>
+              <span>100% Maximum Standout</span>
+            </div>
+          </div>
+
+          {/* Preset Buttons */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+            {[
+              { label: 'Subtle', pct: 0.25, desc: 'Gentle cadence & nuance' },
+              { label: 'Balanced', pct: 0.50, desc: 'Natural accent & style' },
+              { label: 'Pronounced', pct: 0.75, desc: 'Vivid, prominent presence' },
+              { label: 'Full Immersion', pct: 1.00, desc: 'Maximum standout character' }
+            ].map((preset) => {
+              const isActive = Math.abs(settings.affectIntensity - preset.pct) < 0.08;
               return (
                 <button
-                  key={profile.id}
-                  onClick={() => handlePersonaSelect(profile.id)}
-                  className={`p-4 rounded-xl border text-left transition-all duration-300 relative group flex flex-col justify-between cursor-pointer ${
-                    isSelected
-                      ? 'bg-zinc-950 border-[#DC143C] shadow-[0_0_20px_rgba(220,20,60,0.15)] ring-1 ring-[#DC143C]/40'
-                      : 'bg-black border-zinc-900 hover:border-zinc-800 hover:bg-zinc-950/60'
+                  key={preset.label}
+                  onClick={() => handleUpdate({ affectIntensity: preset.pct })}
+                  className={`p-2.5 rounded-lg border text-left transition-colors cursor-pointer ${
+                    isActive
+                      ? 'bg-zinc-950 border-[#DC143C] text-white ring-1 ring-[#DC143C]/40'
+                      : 'bg-black border-zinc-900 text-zinc-400 hover:border-zinc-800 hover:text-zinc-200'
                   }`}
                 >
-                  <div>
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl p-1.5 bg-zinc-900/80 rounded-lg border border-zinc-800">
-                          {profile.avatar}
-                        </span>
-                        <div>
-                          <h4 className={`text-xs font-bold font-syne uppercase tracking-wider ${
-                            isSelected ? 'text-[#F8F7F4]' : 'text-zinc-300 group-hover:text-white'
-                          }`}>
-                            {profile.title}
-                          </h4>
-                          <span className="text-[9px] text-[#DC143C] font-mono block">
-                            {profile.tone}
-                          </span>
-                        </div>
-                      </div>
-
-                      {isSelected && (
-                        <div className="w-4 h-4 rounded-full bg-[#DC143C] text-white flex items-center justify-center text-[9px] font-bold">
-                          ✓
-                        </div>
-                      )}
-                    </div>
-
-                    <p className="text-[10.5px] leading-relaxed text-zinc-400 mt-2 font-google-sans">
-                      {profile.tagline}
-                    </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold uppercase">{preset.label}</span>
+                    <span className="text-[10px] font-mono text-[#DC143C] font-semibold">{Math.round(preset.pct * 100)}%</span>
                   </div>
-
-                  <div className="mt-3 pt-2.5 border-t border-zinc-900/60 flex items-center justify-between text-[9px] font-mono text-zinc-500">
-                    <span>Base Pitch: {profile.defaultPitch}x</span>
-                    <span>Base Speed: {profile.defaultSpeed}x</span>
-                  </div>
+                  <div className="text-[10px] text-zinc-500 mt-0.5">{preset.desc}</div>
                 </button>
               );
             })}
           </div>
 
-          {/* Persona Live Quote Card */}
-          <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-xl space-y-2 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#DC143C]/5 rounded-full blur-2xl pointer-events-none" />
-            <div className="flex items-center gap-2 text-[9px] font-mono uppercase tracking-widest text-zinc-500 font-bold">
-              <span className="text-[#DC143C]">✦</span>
-              Active Astral Matrix Quote
+          {/* Standout Dialogue Sample Preview */}
+          <div className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-900/80 space-y-2">
+            <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
+              <span className="uppercase tracking-wider font-semibold text-zinc-300">
+                Live Audition: {activeProfile.title}
+              </span>
+              <button
+                onClick={() => {
+                  const phrase = getAffectSampleQuote(activeProfile, settings.affectIntensity);
+                  voiceEngine.testVoice(settings, phrase);
+                }}
+                disabled={!settings.enabled}
+                className={`px-2.5 py-1 rounded border uppercase transition-colors cursor-pointer text-[9px] font-mono font-bold tracking-wider ${
+                  !settings.enabled
+                    ? 'bg-zinc-900 text-zinc-600 border-zinc-900 cursor-not-allowed'
+                    : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-[#DC143C] hover:text-white'
+                }`}
+              >
+                Audition Spoken Affect
+              </button>
             </div>
-            <p className="text-xs text-zinc-300 italic font-google-sans pl-2 border-l-2 border-[#DC143C]">
-              "{activeProfile.testPhrase}"
+            <p className="text-xs italic text-zinc-300 leading-relaxed font-google-sans">
+              "{getAffectSampleQuote(activeProfile, settings.affectIntensity)}"
             </p>
           </div>
         </div>
 
-        {/* Right Column: Granular Controls & Sliders */}
-        <div className="lg:col-span-5 space-y-4">
+        {/* Section 3: Pitch and Cadence Modulation Sliders */}
+        <div className="space-y-4 pb-5 border-b border-zinc-900">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 font-bold flex items-center gap-1.5">
-              <span className="text-[#DC143C]">✦</span>
-              Granular Modulation
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-200">
+              Audio Modulation
             </span>
             <button
-              onClick={handleResetDefaults}
-              className="text-[9px] uppercase font-mono text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors cursor-pointer"
+              onClick={handleResetSliders}
+              className="text-[10px] font-mono uppercase text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
             >
               Reset Sliders
             </button>
           </div>
 
-          <div className="bg-black border border-zinc-900 rounded-xl p-5 space-y-6 shadow-xl">
-            
-            {/* Pitch Modulation Slider */}
-            <div className="space-y-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* Pitch Slider */}
+            <div className="space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <label className="text-[10px] uppercase font-mono font-bold tracking-wider text-zinc-300">
-                  Resonance Pitch
+                <label className="text-xs font-mono text-zinc-300">
+                  Pitch
                 </label>
-                <span className="text-xs font-mono font-bold text-[#DC143C] bg-[#DC143C]/10 px-2 py-0.5 rounded border border-[#DC143C]/20">
+                <span className="text-xs font-mono font-bold text-[#DC143C] bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800">
                   {settings.pitch.toFixed(2)}x
                 </span>
               </div>
-
               <input
                 type="range"
                 min="0.5"
@@ -249,25 +369,23 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
                 onChange={(e) => handleUpdate({ pitch: parseFloat(e.target.value) })}
                 className="w-full accent-[#DC143C] bg-zinc-900 h-1.5 rounded-lg appearance-none cursor-pointer"
               />
-
-              <div className="flex justify-between text-[8px] font-mono text-zinc-600 uppercase">
-                <span>0.5x (Deep/Archaic)</span>
-                <span>1.0x (Harmonic)</span>
-                <span>1.8x (Ethereal)</span>
+              <div className="flex justify-between text-[9px] font-mono text-zinc-600 uppercase">
+                <span>0.50x Low</span>
+                <span>1.00x Natural</span>
+                <span>1.80x High</span>
               </div>
             </div>
 
-            {/* Speed / Rate Modulation Slider */}
-            <div className="space-y-2.5">
+            {/* Cadence Slider */}
+            <div className="space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <label className="text-[10px] uppercase font-mono font-bold tracking-wider text-zinc-300">
-                  Vocal Cadence Speed
+                <label className="text-xs font-mono text-zinc-300">
+                  Cadence
                 </label>
-                <span className="text-xs font-mono font-bold text-[#DC143C] bg-[#DC143C]/10 px-2 py-0.5 rounded border border-[#DC143C]/20">
+                <span className="text-xs font-mono font-bold text-[#DC143C] bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800">
                   {settings.speed.toFixed(2)}x
                 </span>
               </div>
-
               <input
                 type="range"
                 min="0.5"
@@ -277,54 +395,127 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
                 onChange={(e) => handleUpdate({ speed: parseFloat(e.target.value) })}
                 className="w-full accent-[#DC143C] bg-zinc-900 h-1.5 rounded-lg appearance-none cursor-pointer"
               />
-
-              <div className="flex justify-between text-[8px] font-mono text-zinc-600 uppercase">
-                <span>0.5x (Meditative)</span>
-                <span>1.0x (Standard)</span>
-                <span>1.8x (Electric)</span>
+              <div className="flex justify-between text-[9px] font-mono text-zinc-600 uppercase">
+                <span>0.50x Deliberate</span>
+                <span>1.00x Normal</span>
+                <span>1.80x Swift</span>
               </div>
             </div>
-
-            {/* Test Voice Control */}
-            <div className="pt-4 border-t border-zinc-900 space-y-3">
-              <button
-                onClick={handleTestVoice}
-                disabled={!settings.enabled}
-                className={`w-full py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg ${
-                  !settings.enabled
-                    ? 'bg-zinc-900 text-zinc-700 cursor-not-allowed border border-zinc-800'
-                    : isSpeaking
-                    ? 'bg-zinc-900 text-[#DC143C] border border-[#DC143C] shadow-[0_0_20px_rgba(220,20,60,0.2)]'
-                    : 'bg-[#DC143C] hover:bg-[#B81132] text-white shadow-[0_4px_20px_rgba(220,20,60,0.25)]'
-                }`}
-              >
-                {isSpeaking ? (
-                  <span>Halt Vocal Transmission</span>
-                ) : (
-                  <span>Test Voice Synthesis</span>
-                )}
-              </button>
-
-              {isSpeaking && (
-                <div className="flex items-center justify-center gap-1 py-1">
-                  <div className="w-1 h-3 bg-[#DC143C] rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <div className="w-1 h-5 bg-[#DC143C] rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <div className="w-1 h-4 bg-[#DC143C] rounded-full animate-bounce" />
-                  <div className="w-1 h-6 bg-[#DC143C] rounded-full animate-bounce [animation-delay:0.1s]" />
-                  <div className="w-1 h-3 bg-[#DC143C] rounded-full animate-bounce [animation-delay:0.2s]" />
-                  <span className="text-[10px] font-mono text-zinc-400 ml-2">Synthesizing audio wave...</span>
-                </div>
-              )}
-            </div>
-
           </div>
+        </div>
 
-          {/* Quick Guidance Info */}
-          <div className="p-3 bg-zinc-950/80 border border-zinc-900/60 rounded-lg text-[10px] text-zinc-500 font-mono flex items-center gap-2">
-            <span className="text-[#DC143C]">✦</span>
-            <span>Voice synthesis automatically articulates all tarot and spiritual consultations.</span>
+        {/* Section 3: Voice-to-Text (STT) Settings */}
+        <div className="space-y-3 pb-5 border-b border-zinc-900">
+          <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-200">
+            Voice-to-Text Input (STT)
           </div>
+          <p className="text-xs text-zinc-400">
+            Enables microphone dictation across all text fields in the Oracle and Divination interfaces.
+          </p>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <button
+              onClick={() => handleUpdate({ sttEnabled: !settings.sttEnabled })}
+              className={`p-3 rounded-lg border text-left transition-colors cursor-pointer flex items-center justify-between ${
+                settings.sttEnabled
+                  ? 'bg-zinc-950 border-[#DC143C]/70 text-white'
+                  : 'bg-black border-zinc-900 text-zinc-400 hover:border-zinc-800'
+              }`}
+            >
+              <div>
+                <div className="text-xs font-mono font-bold uppercase">Dictation Input</div>
+                <div className="text-[10px] text-zinc-500">Show Voice button in chat fields</div>
+              </div>
+              <span className="text-xs font-mono font-bold text-[#DC143C]">
+                {settings.sttEnabled ? 'Enabled' : 'Disabled'}
+              </span>
+            </button>
+
+            <button
+              onClick={() => handleUpdate({ autoSendVoice: !settings.autoSendVoice })}
+              className={`p-3 rounded-lg border text-left transition-colors cursor-pointer flex items-center justify-between ${
+                settings.autoSendVoice
+                  ? 'bg-zinc-950 border-[#DC143C]/70 text-white'
+                  : 'bg-black border-zinc-900 text-zinc-400 hover:border-zinc-800'
+              }`}
+            >
+              <div>
+                <div className="text-xs font-mono font-bold uppercase">Auto-Send on Silence</div>
+                <div className="text-[10px] text-zinc-500">Send message automatically on pause</div>
+              </div>
+              <span className="text-xs font-mono font-bold text-[#DC143C]">
+                {settings.autoSendVoice ? 'Enabled' : 'Disabled'}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Section 4: Voice Cloning & Audio Export Profile */}
+        <div className="space-y-3 pb-5 border-b border-zinc-900">
+          <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-200">
+            Audio Exports & Voice Profile Configuration
+          </div>
+          <p className="text-xs text-zinc-400">
+            Choose how user dialogue is articulated in exported MP3 conversation recordings.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+            <button
+              onClick={() => handleUpdate({ userVoiceMode: 'actual' })}
+              className={`p-3 rounded-lg border text-left transition-colors cursor-pointer ${
+                settings.userVoiceMode === 'actual'
+                  ? 'bg-zinc-950 border-[#DC143C] text-white ring-1 ring-[#DC143C]/40'
+                  : 'bg-black border-zinc-900 text-zinc-400 hover:border-zinc-800'
+              }`}
+            >
+              <div className="text-xs font-mono font-bold uppercase">Actual Voice</div>
+              <div className="text-[10px] text-zinc-500 mt-1">Captured directly via microphone STT recording</div>
+            </button>
+
+            <button
+              onClick={() => handleUpdate({ userVoiceMode: 'cloned' })}
+              className={`p-3 rounded-lg border text-left transition-colors cursor-pointer ${
+                settings.userVoiceMode === 'cloned'
+                  ? 'bg-zinc-950 border-[#DC143C] text-white ring-1 ring-[#DC143C]/40'
+                  : 'bg-black border-zinc-900 text-zinc-400 hover:border-zinc-800'
+              }`}
+            >
+              <div className="text-xs font-mono font-bold uppercase">Cloned Audio Profile</div>
+              <div className="text-[10px] text-zinc-500 mt-1">Modulated audio synthesis profile matching user tone</div>
+            </button>
+
+            <button
+              onClick={() => handleUpdate({ userVoiceMode: 'default' })}
+              className={`p-3 rounded-lg border text-left transition-colors cursor-pointer ${
+                settings.userVoiceMode === 'default'
+                  ? 'bg-zinc-950 border-[#DC143C] text-white ring-1 ring-[#DC143C]/40'
+                  : 'bg-black border-zinc-900 text-zinc-400 hover:border-zinc-800'
+              }`}
+            >
+              <div className="text-xs font-mono font-bold uppercase">Default System Voice</div>
+              <div className="text-[10px] text-zinc-500 mt-1">Standard system speech synthesis (Opt-out of cloning)</div>
+            </button>
+          </div>
+        </div>
+
+        {/* Section 5: Esoteric Wisdom Persona Sample */}
+        <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-xl space-y-1.5">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-[#DC143C] font-bold">
+            Esoteric Wisdom Sample
+          </div>
+          <p className="text-xs text-zinc-300 italic pl-3 border-l-2 border-[#DC143C]">
+            "{activeProfile.testPhrase}"
+          </p>
+        </div>
+
+        {/* Mandatory Performance Notice & Disclaimer */}
+        <div className="p-4 bg-black border border-zinc-800/80 rounded-xl">
+          <div className="text-[10px] font-mono uppercase font-bold text-zinc-400 mb-1 tracking-wider">
+            Performance Notice & Disclaimer
+          </div>
+          <p className="text-xs text-zinc-400 leading-relaxed font-google-sans">
+            Enabling real-time voice synthesis, audio cloning, and advanced voice-to-text processing may impact application responsiveness and loading speeds depending on your hardware and network connection. You may opt out of audio processing features at any time to optimize performance.
+          </p>
         </div>
 
       </div>

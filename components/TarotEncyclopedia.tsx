@@ -93,16 +93,6 @@ export const TarotEncyclopedia: React.FC<TarotEncyclopediaProps> = ({
             Explore the mysteries of the Tarot. Delve into the core esoteric symbolism, elemental rulers, and upright & reversed interpretations, or converse directly with any living card archetype.
           </p>
         </div>
-
-        {onReturnToChat && (
-          <button
-            onClick={onReturnToChat}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-[#DC143C]/50 text-zinc-300 hover:text-white text-xs font-mono transition-all self-start md:self-center cursor-pointer shadow-md group"
-          >
-            <span className="text-[#DC143C] font-bold">←</span>
-            <span className="font-bold uppercase tracking-wider text-[10px]">Return to Oracle Chat</span>
-          </button>
-        )}
       </div>
 
       {/* PRIMARY 2 TABS: MAJOR ARCANA vs MINOR ARCANA */}

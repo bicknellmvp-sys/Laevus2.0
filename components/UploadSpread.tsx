@@ -263,6 +263,8 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
         ? customQuestion.trim()
         : "Synthesize the deep esoteric trajectory and weave a narrative tapestry for these physical realm cards.";
 
+      const currentVoiceSettings = getSavedVoiceSettings();
+
       const reply = await metaphysicalConsultation(
         `Synthesize this physical realm Tarot spread: "${queryPrompt}"`,
         [],
@@ -270,14 +272,15 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           mode: 'tarot-physical',
           tarotCards: drawnCards,
           tarotQuestion: queryPrompt,
-          readingCount: 1
+          readingCount: 1,
+          persona: currentVoiceSettings.persona,
+          affectIntensity: currentVoiceSettings.affectIntensity
         }
       );
 
       setGeneratedReading(reply);
 
       // Capture voice settings active at time of synthesis
-      const currentVoiceSettings = getSavedVoiceSettings();
       setActiveReadingVoiceSettings(currentVoiceSettings);
 
       // Persist to Past Spread Readings storage
@@ -352,16 +355,6 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
         </div>
 
         <div className="flex items-center gap-3 self-start sm:self-center">
-          {onReturnToChat && (
-            <button
-              onClick={onReturnToChat}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-[#DC143C]/50 text-zinc-300 hover:text-white text-xs font-mono transition-all cursor-pointer shadow-md group"
-            >
-              <span className="text-[#DC143C] font-bold">←</span>
-              <span className="font-bold uppercase tracking-wider text-[10px]">Return to Oracle Chat</span>
-            </button>
-          )}
-
           {/* Past Readings Sidebar Trigger */}
           <button
             onClick={() => setIsPastReadingsSidebarOpen(true)}
@@ -949,20 +942,6 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              {/* Copy Reading Button */}
-              <button
-                onClick={handleCopyReading}
-                className={`px-3 py-1.5 rounded-lg border text-xs font-mono uppercase flex items-center gap-1.5 transition-all cursor-pointer ${
-                  copiedReading
-                    ? 'bg-emerald-600 text-white border-emerald-500 font-bold'
-                    : 'bg-black text-zinc-300 border-zinc-800 hover:border-[#DC143C]/50 hover:text-white'
-                }`}
-                title="Copy reading text to clipboard"
-              >
-                <span>{copiedReading ? '✓' : '📋'}</span>
-                <span>{copiedReading ? 'Copied' : 'Copy'}</span>
-              </button>
-
               {/* Share Reading Button */}
               <button
                 onClick={handleShareSpreadReading}
@@ -996,7 +975,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
             </div>
           </div>
 
-          <div className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-google-sans whitespace-pre-wrap pl-2 border-l-2 border-[#DC143C] select-text">
+          <div className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-google-sans whitespace-pre-wrap pl-2 border-l-2 border-[#DC143C] select-text cursor-text">
             {generatedReading}
           </div>
 

@@ -77,7 +77,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="h-screen bg-transparent text-[#F8F7F4] selection:bg-[#DC143C]/20 selection:text-[#DC143C] overflow-x-hidden overflow-y-auto relative flex flex-col pb-2 font-mono">
+    <div className="h-screen bg-transparent text-[#F8F7F4] selection:bg-purple-900/50 selection:text-purple-200 overflow-x-hidden overflow-y-auto relative flex flex-col pb-2 font-mono">
       
       {/* Centered Content Container */}
       <div className="flex-1 flex flex-col w-full relative z-10">
@@ -93,7 +93,7 @@ const App: React.FC = () => {
                   <span className="font-syne font-extrabold text-[#F8F7F4] tracking-tight">LAEVUS</span>
                   <span className="text-zinc-600">|</span>
                   <span className="text-[10px] text-[#DC143C] uppercase font-bold tracking-wider">
-                    {activeView === 'divination' ? 'Divination Sanctuary' : activeView === 'account' ? 'Account Hub' : activeView === 'encyclopedia' ? 'Living Tarot Encyclopedia' : activeView === 'tarot' ? '3-Card Oracle' : activeView}
+                    {activeView === 'divination' ? 'Divination' : activeView === 'account' ? 'Account Hub' : activeView === 'encyclopedia' ? 'Living Tarot Encyclopedia' : activeView === 'tarot' ? '3-Card Oracle' : activeView}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">

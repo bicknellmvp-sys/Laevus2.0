@@ -14,12 +14,6 @@ export interface PersonaProfile {
   preferredLang?: string;
   testPhrase: string;
   systemPromptDirective: string;
-  sampleQuotes: {
-    subtle: string;
-    balanced: string;
-    pronounced: string;
-    immersion: string;
-  };
 }
 
 export interface VoiceSettings {
@@ -27,7 +21,6 @@ export interface VoiceSettings {
   persona: PersonaId;
   pitch: number;
   speed: number;
-  affectIntensity: number; // 0.20 to 1.00 (Affect: How much the persona stands out)
   // User Voice Cloning & Input Configurations
   sttEnabled: boolean;
   userVoiceMode: 'actual' | 'cloned' | 'default';
@@ -49,13 +42,7 @@ export const PERSONA_PROFILES: Record<PersonaId, PersonaProfile> = {
     voiceGender: 'female',
     preferredLang: 'ru-RU',
     testPhrase: 'Wisdom does not shout. It listens quietly to the patterns beneath the surface.',
-    systemPromptDirective: 'Speak with an accentuated Russian accent and a grounded, perceptive tone.',
-    sampleQuotes: {
-      subtle: 'Wisdom does not shout. It listens quietly to the patterns beneath the surface.',
-      balanced: 'Look closely, my friend. In truth, the mind weaves illusions until quiet observation dissolves them.',
-      pronounced: 'Listen to me, my dear friend. What you call chance is merely the hidden hand of karmic law. Let us peer through the veil.',
-      immersion: 'Aha! Look deeply into the ether, my friend. The intellect alone is clumsy, like hands grasping at smoke. In truth, the spiritual architecture reveals all.'
-    }
+    systemPromptDirective: 'Speak with an accentuated Russian accent and a grounded, perceptive tone.'
   },
   'Sophisticated Gentleman': {
     id: 'Sophisticated Gentleman',
@@ -68,13 +55,7 @@ export const PERSONA_PROFILES: Record<PersonaId, PersonaProfile> = {
     voiceGender: 'male',
     preferredLang: 'en-US',
     testPhrase: 'Good evening. Let us examine your question with discernment and steady resolve.',
-    systemPromptDirective: 'Speak with an authoritative, polished Southern American accent and gentlemanly composure.',
-    sampleQuotes: {
-      subtle: 'Good evening. Let us examine your question with discernment and steady resolve.',
-      balanced: 'Well now, let us take the measure of this situation with proper decorum and a clear head.',
-      pronounced: 'Well now, my good friend, if you will permit me an observation: a gentleman never rushes to a conclusion before surveying the ground.',
-      immersion: 'Well now, sir or madam, let us set our cards squarely on the table. In my years, I have learned that haste is the enemy of prosperity. Let us attend to the heart of this matter with unflappable resolve.'
-    }
+    systemPromptDirective: 'Speak with an authoritative, polished Southern American accent and gentlemanly composure.'
   },
   'Khan': {
     id: 'Khan',
@@ -87,13 +68,7 @@ export const PERSONA_PROFILES: Record<PersonaId, PersonaProfile> = {
     voiceGender: 'male',
     preferredLang: 'en-US',
     testPhrase: 'Look directly at your obstacles. Strength is forged through discipline and clear intent.',
-    systemPromptDirective: 'Speak with a deep, commanding historical Central Asian and Mongolian timbre.',
-    sampleQuotes: {
-      subtle: 'Look directly at your obstacles. Strength is forged through discipline and clear intent.',
-      balanced: 'A warrior does not quarrel with the wind; he turns his horse and advances. What is your true aim?',
-      pronounced: 'Strip away the excuses that weaken your sight. In battle and in life, victory belongs to the one who conquers self-doubt first.',
-      immersion: 'Steel is only forged in fire! Speak plainly and without fear. If you hesitate before the mountain, the mountain will crush you. Stand firm, choose your path, and strike with absolute certainty.'
-    }
+    systemPromptDirective: 'Speak with a deep, commanding historical Central Asian and Mongolian timbre.'
   },
   'Marie': {
     id: 'Marie',
@@ -106,13 +81,7 @@ export const PERSONA_PROFILES: Record<PersonaId, PersonaProfile> = {
     voiceGender: 'female',
     preferredLang: 'fr-FR',
     testPhrase: 'Bonjour. Let us see what is true and what can be understood with clarity.',
-    systemPromptDirective: 'Speak with a classical French accent, articulate, poised, and elegant.',
-    sampleQuotes: {
-      subtle: "Bonjour. Let us see what is true and what can be understood with clarity.",
-      balanced: "Ah, let us illuminate this question with poise and reason, n'est-ce pas? Beauty and truth walk together.",
-      pronounced: "Ah, mais oui! Let us look upon your question with lucid discernment. There is an art to separating sentiment from true destiny.",
-      immersion: "Ah, mon cher ami, look closely! Why clutter the spirit with doubt when reason and delicate intuition can illuminate the whole garden? C'est magnifique when one sees through the mist with absolute poise."
-    }
+    systemPromptDirective: 'Speak with a classical French accent, articulate, poised, and elegant.'
   }
 };
 
@@ -123,7 +92,6 @@ export const DEFAULT_VOICE_SETTINGS: VoiceSettings = {
   persona: 'Madame Blavatsky',
   pitch: 0.85,
   speed: 0.90,
-  affectIntensity: 0.85,
   sttEnabled: true,
   userVoiceMode: 'cloned',
   clonedPitch: 1.0,
@@ -146,7 +114,6 @@ export const getSavedVoiceSettings = (): VoiceSettings => {
       persona,
       pitch: typeof parsed.pitch === 'number' ? Math.max(0.5, Math.min(1.8, parsed.pitch)) : PERSONA_PROFILES[persona].defaultPitch,
       speed: typeof parsed.speed === 'number' ? Math.max(0.5, Math.min(1.8, parsed.speed)) : PERSONA_PROFILES[persona].defaultSpeed,
-      affectIntensity: typeof parsed.affectIntensity === 'number' ? Math.max(0.2, Math.min(1.0, parsed.affectIntensity)) : DEFAULT_VOICE_SETTINGS.affectIntensity,
       sttEnabled: typeof parsed.sttEnabled === 'boolean' ? parsed.sttEnabled : DEFAULT_VOICE_SETTINGS.sttEnabled,
       userVoiceMode: ['actual', 'cloned', 'default'].includes(parsed.userVoiceMode) ? parsed.userVoiceMode : DEFAULT_VOICE_SETTINGS.userVoiceMode,
       clonedPitch: typeof parsed.clonedPitch === 'number' ? parsed.clonedPitch : DEFAULT_VOICE_SETTINGS.clonedPitch,
@@ -267,31 +234,8 @@ class VoiceEngine {
 
     const truncated = clean.length > 1200 ? clean.slice(0, 1200) + '...' : clean;
     const utterance = new SpeechSynthesisUtterance(truncated);
-    
-    // Apply affect intensity modulation to make character accents and presence stand out
-    const affect = typeof settings.affectIntensity === 'number' ? settings.affectIntensity : 0.85;
-    let effectivePitch = settings.pitch;
-    let effectiveRate = settings.speed;
-
-    if (settings.persona === 'Khan') {
-      // Khan deepens and slows with higher affect for commanding authority
-      effectivePitch = Math.max(0.55, settings.pitch - (affect - 0.5) * 0.16);
-      effectiveRate = Math.max(0.75, settings.speed - (affect - 0.5) * 0.12);
-    } else if (settings.persona === 'Marie') {
-      // Marie gains elevated pitch and French melodic cadence
-      effectivePitch = Math.min(1.4, settings.pitch + (affect - 0.5) * 0.14);
-      effectiveRate = Math.max(0.85, settings.speed - (affect - 0.5) * 0.08);
-    } else if (settings.persona === 'Sophisticated Gentleman') {
-      // Southern cadence takes a measured, distinguished drawl
-      effectiveRate = Math.max(0.80, settings.speed - (affect - 0.5) * 0.14);
-    } else if (settings.persona === 'Madame Blavatsky') {
-      // Grounded resonance and contemplative pacing
-      effectivePitch = Math.max(0.65, settings.pitch - (affect - 0.5) * 0.10);
-      effectiveRate = Math.max(0.78, settings.speed - (affect - 0.5) * 0.10);
-    }
-
-    utterance.pitch = Math.max(0.5, Math.min(1.8, effectivePitch));
-    utterance.rate = Math.max(0.5, Math.min(1.8, effectiveRate));
+    utterance.pitch = settings.pitch;
+    utterance.rate = settings.speed;
 
     const selectedVoice = this.selectVoice(settings.persona);
     if (selectedVoice) {
@@ -320,27 +264,9 @@ class VoiceEngine {
     window.speechSynthesis.speak(utterance);
   }
 
-  public testVoice(settings: VoiceSettings, customPhrase?: string): void {
+  public testVoice(settings: VoiceSettings): void {
     const profile = PERSONA_PROFILES[settings.persona] || PERSONA_PROFILES['Madame Blavatsky'];
-    if (customPhrase) {
-      this.speak(customPhrase, settings);
-      return;
-    }
-
-    const affect = typeof settings.affectIntensity === 'number' ? settings.affectIntensity : 0.85;
-    let phrase = profile.testPhrase;
-    if (profile.sampleQuotes) {
-      if (affect >= 0.86) {
-        phrase = profile.sampleQuotes.immersion;
-      } else if (affect >= 0.66) {
-        phrase = profile.sampleQuotes.pronounced;
-      } else if (affect >= 0.40) {
-        phrase = profile.sampleQuotes.balanced;
-      } else {
-        phrase = profile.sampleQuotes.subtle;
-      }
-    }
-    this.speak(phrase, settings);
+    this.speak(profile.testPhrase, settings);
   }
 }
 

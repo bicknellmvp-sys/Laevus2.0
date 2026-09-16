@@ -21,6 +21,13 @@ const App: React.FC = () => {
 
   // Reference to call clear history in LaevusChat
   const clearHistoryFnRef = useRef<() => void>(() => {});
+  const rootScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (rootScrollRef.current) {
+      rootScrollRef.current.scrollTop = 0;
+    }
+  }, [activeView]);
 
   useEffect(() => {
     // Dynamic but persistent session ID per tab session
@@ -77,7 +84,10 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="h-screen bg-transparent text-[#F8F7F4] selection:bg-purple-900/50 selection:text-purple-200 overflow-x-hidden overflow-y-auto relative flex flex-col pb-2 font-mono">
+    <div 
+      ref={rootScrollRef}
+      className="h-screen bg-transparent text-[#F8F7F4] selection:bg-purple-900/50 selection:text-purple-200 overflow-x-hidden overflow-y-auto relative flex flex-col pb-2 font-mono"
+    >
       
       {/* Centered Content Container */}
       <div className="flex-1 flex flex-col w-full relative z-10">
@@ -126,7 +136,7 @@ const App: React.FC = () => {
           </div>
 
           {/* 2. DYNAMIC WORKSPACE LAYER */}
-          <div className="w-full flex-1 flex flex-col px-2 sm:px-4">
+          <div className="w-full flex-1 flex flex-col px-2 sm:px-4 min-h-0">
             
             {/* DEDICATED VIEW: VOICE SETTINGS */}
             {activeView === 'voice-settings' && (

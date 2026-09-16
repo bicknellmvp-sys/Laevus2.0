@@ -3,7 +3,7 @@ import { TAROT_DATABASE } from '../data/tarotCards';
 
 export interface TarotCard {
   name: string;
-  position: 'Past' | 'Present' | 'Future';
+  position: 'Past' | 'Present' | 'Future' | 'Follow-up' | string;
   description: string;
   symbol: string;
   meaning: string;
@@ -19,16 +19,26 @@ const TAROT_DECK: Omit<TarotCard, 'position'>[] = TAROT_DATABASE.map(card => ({
 }));
 
 interface ThreeCardOracleProps {
-  onStartReading: (prompt: string, mode: 'tarot' | 'tarot-physical', cards: TarotCard[]) => void;
+  onStartReading: (
+    prompt: string, 
+    mode: 'tarot' | 'tarot-physical', 
+    cards: TarotCard[],
+    extra?: { followUpQuestion?: string; primaryQuestion?: string }
+  ) => void;
   onShareTarotReading?: (question: string, cards: TarotCard[]) => void;
+  onSelectEncyclopedia?: () => void;
 }
 
 export const ThreeCardOracle: React.FC<ThreeCardOracleProps> = ({
   onStartReading,
-  onShareTarotReading
+  onShareTarotReading,
+  onSelectEncyclopedia
 }) => {
   const [tarotMode, setTarotMode] = useState<'digital' | 'physical'>('digital');
+  const [enableInquiry, setEnableInquiry] = useState(false);
   const [tarotQuestion, setTarotQuestion] = useState('');
+  const [enableFollowUp, setEnableFollowUp] = useState(false);
+  const [followUpQuestion, setFollowUpQuestion] = useState('');
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawnCards, setDrawnCards] = useState<TarotCard[]>([]);
   const [flippedCount, setFlippedCount] = useState(0);
@@ -37,10 +47,15 @@ export const ThreeCardOracle: React.FC<ThreeCardOracleProps> = ({
   const [physicalPastCard, setPhysicalPastCard] = useState('');
   const [physicalPresentCard, setPhysicalPresentCard] = useState('');
   const [physicalFutureCard, setPhysicalFutureCard] = useState('');
+  const [physicalFollowUpCard, setPhysicalFollowUpCard] = useState('');
 
   const handleDrawTarot = async () => {
-    if (!tarotQuestion.trim()) {
-      alert("Please define the query or question you wish to explore.");
+    if (enableInquiry && !tarotQuestion.trim()) {
+      alert("Please define your inquiry, or uncheck 'Enable Inquiry' for open guidance.");
+      return;
+    }
+    if (enableFollowUp && !followUpQuestion.trim()) {
+      alert("Please enter your follow-up question to be answered by the 4th card.");
       return;
     }
 
@@ -55,35 +70,60 @@ export const ThreeCardOracle: React.FC<ThreeCardOracleProps> = ({
       { ...shuffled[2], position: 'Future' }
     ];
 
+    if (enableFollowUp) {
+      drawn.push({ ...shuffled[3], position: 'Follow-up' });
+    }
+
     setDrawnCards(drawn);
 
-    for (let i = 1; i <= 3; i++) {
-      await new Promise(res => setTimeout(res, 500));
+    const totalToFlip = drawn.length;
+    for (let i = 1; i <= totalToFlip; i++) {
+      await new Promise(res => setTimeout(res, 450));
       setFlippedCount(i);
     }
 
     await new Promise(res => setTimeout(res, 400));
     setIsDrawing(false);
 
-    onStartReading(`Perform a tailored Tarot reading regarding: "${tarotQuestion}"`, 'tarot', drawn);
+    const effectiveQuestion = enableInquiry && tarotQuestion.trim() ? tarotQuestion.trim() : "General life alignment & open wisdom";
+    const effectiveFollowUp = enableFollowUp && followUpQuestion.trim() ? followUpQuestion.trim() : undefined;
+
+    const promptText = effectiveFollowUp
+      ? `Perform a 4-card tailored Tarot reading. Primary Inquiry: "${effectiveQuestion}". Follow-up Question: "${effectiveFollowUp}". First 3 cards represent Past, Present, Future. The 4th card answers the follow-up question using the primary inquiry and initial cards as context.`
+      : `Perform a tailored Tarot reading regarding: "${effectiveQuestion}"`;
+
+    onStartReading(promptText, 'tarot', drawn, {
+      primaryQuestion: effectiveQuestion,
+      followUpQuestion: effectiveFollowUp
+    });
     setTarotQuestion('');
+    setFollowUpQuestion('');
   };
 
   const handlePhysicalSynthesis = async () => {
-    if (!tarotQuestion.trim()) {
-      alert("Please define the question you wish the cards to answer.");
+    if (enableInquiry && !tarotQuestion.trim()) {
+      alert("Please define the question you wish the cards to answer, or uncheck 'Enable Inquiry'.");
+      return;
+    }
+    if (enableFollowUp && !followUpQuestion.trim()) {
+      alert("Please enter your follow-up question to be answered by the 4th card.");
       return;
     }
     if (!physicalPastCard || !physicalPresentCard || !physicalFutureCard) {
-      alert("Please select cards for all three positions (Past, Present, and Future).");
+      alert("Please select cards for Past, Present, and Future positions.");
+      return;
+    }
+    if (enableFollowUp && !physicalFollowUpCard) {
+      alert("Please select a card for the 4th Follow-up position.");
       return;
     }
 
     const pastObj = TAROT_DECK.find(c => c.name === physicalPastCard);
     const presentObj = TAROT_DECK.find(c => c.name === physicalPresentCard);
     const futureObj = TAROT_DECK.find(c => c.name === physicalFutureCard);
+    const followUpObj = enableFollowUp ? TAROT_DECK.find(c => c.name === physicalFollowUpCard) : undefined;
 
-    if (!pastObj || !presentObj || !futureObj) {
+    if (!pastObj || !presentObj || !futureObj || (enableFollowUp && !followUpObj)) {
       alert("An error occurred. Please select valid cards.");
       return;
     }
@@ -94,74 +134,153 @@ export const ThreeCardOracle: React.FC<ThreeCardOracleProps> = ({
       { ...futureObj, position: 'Future' }
     ];
 
+    if (enableFollowUp && followUpObj) {
+      physicalCards.push({ ...followUpObj, position: 'Follow-up' });
+    }
+
     setIsDrawing(true);
     await new Promise(res => setTimeout(res, 400));
     setIsDrawing(false);
 
-    onStartReading(
-      `Synthesize Tarot spread reading for question: "${tarotQuestion}". Past: ${pastObj.name}, Present: ${presentObj.name}, Future: ${futureObj.name}`,
-      'tarot-physical',
-      physicalCards
-    );
+    const effectiveQuestion = enableInquiry && tarotQuestion.trim() ? tarotQuestion.trim() : "General life alignment & open wisdom";
+    const effectiveFollowUp = enableFollowUp && followUpQuestion.trim() ? followUpQuestion.trim() : undefined;
+
+    const promptText = effectiveFollowUp
+      ? `Synthesize a 4-card Tarot reading for inquiry: "${effectiveQuestion}". Past: ${pastObj.name}, Present: ${presentObj.name}, Future: ${futureObj.name}. Follow-up Question: "${effectiveFollowUp}" answered by 4th Card: ${followUpObj?.name}.`
+      : `Synthesize Tarot spread reading for question: "${effectiveQuestion}". Past: ${pastObj.name}, Present: ${presentObj.name}, Future: ${futureObj.name}`;
+
+    onStartReading(promptText, 'tarot-physical', physicalCards, {
+      primaryQuestion: effectiveQuestion,
+      followUpQuestion: effectiveFollowUp
+    });
     setTarotQuestion('');
+    setFollowUpQuestion('');
   };
+
+  const isDigitalReady = !isDrawing && (!enableInquiry || tarotQuestion.trim().length > 0) && (!enableFollowUp || followUpQuestion.trim().length > 0);
+  const isPhysicalCardsSelected = Boolean(physicalPastCard && physicalPresentCard && physicalFutureCard && (!enableFollowUp || physicalFollowUpCard));
+  const isPhysicalReady = !isDrawing && isPhysicalCardsSelected && (!enableInquiry || tarotQuestion.trim().length > 0) && (!enableFollowUp || followUpQuestion.trim().length > 0);
 
   return (
     <div className="w-full max-w-3xl mx-auto flex-1 flex flex-col justify-center min-h-0 relative animate-fadeIn space-y-4 select-text">
       
-      {/* Mode Switcher: Oracle vs. Offline Spread */}
+      {/* Mode Switcher: LAEVUS vs. PERSONAL PULL */}
       <div className="border-b border-zinc-900/60 pb-3 flex items-center justify-between gap-2">
         <div className="flex gap-1.5 bg-zinc-950 p-1 rounded-xl border border-zinc-900 shadow-inner">
           <button
             onClick={() => setTarotMode('digital')}
             disabled={isDrawing}
-            className={`px-3 py-1 text-xs uppercase tracking-wider font-bold rounded-lg transition-all duration-200 cursor-pointer ${
+            className={`px-3.5 py-1 text-[12px] uppercase tracking-wider font-bold rounded-lg transition-all duration-200 cursor-pointer border ${
               tarotMode === 'digital'
-                ? 'bg-[#DC143C] text-black shadow-md'
-                : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
+                ? 'bg-black text-[#DC143C] border-transparent shadow-[0_0_12px_rgba(220,20,60,0.25)]'
+                : 'bg-black text-zinc-400 border-transparent hover:text-[#DC143C] active:text-[#DC143C] focus:outline-none'
             }`}
           >
-            Oracle
+            LAEVUS
           </button>
           <button
             onClick={() => setTarotMode('physical')}
             disabled={isDrawing}
-            className={`px-3 py-1 text-xs uppercase tracking-wider font-bold rounded-lg transition-all duration-200 cursor-pointer ${
+            className={`px-3.5 py-1 text-[12px] uppercase tracking-wider font-bold rounded-lg transition-all duration-200 cursor-pointer border ${
               tarotMode === 'physical'
-                ? 'bg-[#DC143C] text-black shadow-md'
-                : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
+                ? 'bg-black text-[#DC143C] border-transparent shadow-[0_0_12px_rgba(220,20,60,0.25)]'
+                : 'bg-black text-zinc-400 border-transparent hover:text-[#DC143C] active:text-[#DC143C] focus:outline-none'
             }`}
           >
-            Offline Spread
+            OFFLINE
           </button>
         </div>
       </div>
 
-      {/* Query input field */}
-      <div className="space-y-3.5">
+      {/* Query input field with Enable Checkbox & Follow-up Checkbox on top */}
+      <div className="space-y-2.5">
         <div>
-          <label className="text-[10px] text-zinc-400 uppercase tracking-widest block font-bold mb-1.5 font-google-sans">
-            Enter your inquiry or focus:
-          </label>
+          <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+            <label className="text-[10px] text-zinc-400 uppercase tracking-widest block font-bold font-google-sans">
+              INQUIRY OR FOCUS
+            </label>
+            <div className="flex items-center gap-3">
+              {/* Checkbox 1: Enable inquiry box */}
+              <label className="group flex items-center gap-1 cursor-pointer text-[8.5px] uppercase font-bold tracking-wider text-zinc-400 hover:text-[#DC143C] active:text-[#DC143C] select-none transition-colors">
+                <input
+                  type="checkbox"
+                  checked={enableInquiry}
+                  onChange={(e) => {
+                    setEnableInquiry(e.target.checked);
+                    if (!e.target.checked) {
+                      setTarotQuestion('');
+                    }
+                  }}
+                  disabled={isDrawing}
+                  className="accent-[#DC143C] w-3 h-3 rounded cursor-pointer transition-all duration-150 hover:brightness-125 focus:ring-2 focus:ring-[#DC143C] focus:ring-offset-1 focus:ring-offset-black active:scale-95"
+                />
+                <span className={`transition-colors group-hover:text-[#DC143C] ${enableInquiry ? 'text-[#DC143C]' : 'text-zinc-500'}`}>
+                  Enable Inquiry
+                </span>
+              </label>
+
+              {/* Checkbox 2: Follow-up question & 4th card */}
+              <label className="group flex items-center gap-1 cursor-pointer text-[8.5px] uppercase font-bold tracking-wider text-zinc-400 hover:text-[#DC143C] active:text-[#DC143C] select-none transition-colors">
+                <input
+                  type="checkbox"
+                  checked={enableFollowUp}
+                  onChange={(e) => {
+                    setEnableFollowUp(e.target.checked);
+                    if (!e.target.checked) {
+                      setFollowUpQuestion('');
+                      setPhysicalFollowUpCard('');
+                    }
+                  }}
+                  disabled={isDrawing}
+                  className="accent-[#DC143C] w-3 h-3 rounded cursor-pointer transition-all duration-150 hover:brightness-125 focus:ring-2 focus:ring-[#DC143C] focus:ring-offset-1 focus:ring-offset-black active:scale-95"
+                />
+                <span className={`transition-colors group-hover:text-[#DC143C] ${enableFollowUp ? 'text-[#DC143C] font-bold' : 'text-zinc-500'}`}>
+                  FOLLOW-UP QUESTION
+                </span>
+              </label>
+            </div>
+          </div>
+
           <input 
             type="text"
             value={tarotQuestion}
             onChange={(e) => setTarotQuestion(e.target.value)}
-            disabled={isDrawing}
-            placeholder="e.g. What unseen currents shape my path ahead?"
-            className="w-full bg-zinc-950 border border-zinc-850 focus:border-[#DC143C] text-xs px-3.5 py-2.5 rounded-xl text-zinc-200 outline-none font-google-sans placeholder-zinc-700 shadow-inner select-text cursor-text"
+            disabled={isDrawing || !enableInquiry}
+            placeholder="Inquiries welcomed but not necessary..."
+            className={`w-full text-[10.5px] px-3 py-2 rounded-lg outline-none font-google-sans transition-all duration-200 select-text ${
+              enableInquiry
+                ? 'bg-zinc-950 border border-zinc-800 focus:border-[#DC143C] text-zinc-200 placeholder-zinc-500 shadow-inner cursor-text'
+                : 'bg-zinc-950/40 border border-zinc-900/60 text-zinc-600 placeholder-zinc-700 cursor-not-allowed opacity-50'
+            }`}
           />
         </div>
+
+        {/* Follow-up question input when checkbox is checked */}
+        {enableFollowUp && (
+          <div className="animate-fadeIn space-y-1 pt-0.5">
+            <label className="text-[10px] text-zinc-400 uppercase tracking-widest block font-bold font-google-sans">
+              OUTCOME &amp; RESOLUTIONS
+            </label>
+            <input 
+              type="text"
+              value={followUpQuestion}
+              onChange={(e) => setFollowUpQuestion(e.target.value)}
+              disabled={isDrawing}
+              placeholder="Draw a fourth card for additional insight."
+              className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#DC143C] text-[10.5px] px-3 py-2 rounded-lg text-zinc-200 outline-none font-google-sans placeholder-zinc-500 shadow-inner select-text cursor-text"
+            />
+          </div>
+        )}
 
         {tarotMode === 'digital' ? (
           <div className="space-y-4">
             {drawnCards.length > 0 && (
-              <div className="grid grid-cols-3 gap-3 pt-2">
+              <div className={`grid gap-3 pt-2 ${drawnCards.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
                 {drawnCards.map((card, idx) => {
                   const isFlipped = flippedCount > idx;
                   return (
                     <div 
-                      key={card.name}
+                      key={`${card.name}-${idx}`}
                       className="w-full max-w-[145px] sm:max-w-[165px] mx-auto select-text cursor-text"
                     >
                       {isFlipped ? (
@@ -175,7 +294,11 @@ export const ThreeCardOracle: React.FC<ThreeCardOracleProps> = ({
                           <div className="absolute inset-1.5 border border-amber-500/20 rounded-lg pointer-events-none z-10 shadow-[inset_0_0_12px_rgba(0,0,0,0.6)] group-hover:border-amber-500/40 transition-colors" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/70 z-10 pointer-events-none" />
                           <div className="relative z-20 pt-2.5 flex flex-col items-center">
-                            <span className="text-[8px] text-[#DC143C] uppercase font-mono tracking-widest font-bold bg-black/85 border border-[#DC143C]/30 px-2 py-0.5 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
+                            <span className={`text-[8px] uppercase font-mono tracking-widest font-bold bg-black/85 border px-2 py-0.5 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.5)] ${
+                              card.position === 'Follow-up' 
+                                ? 'text-amber-400 border-amber-500/40' 
+                                : 'text-[#DC143C] border-[#DC143C]/30'
+                            }`}>
                               {card.position}
                             </span>
                           </div>
@@ -206,10 +329,10 @@ export const ThreeCardOracle: React.FC<ThreeCardOracleProps> = ({
             )}
 
             {/* Reading Actions: Share Reading only (No dedicated Copy button) */}
-            {drawnCards.length === 3 && flippedCount === 3 && onShareTarotReading && (
+            {drawnCards.length > 0 && flippedCount === drawnCards.length && onShareTarotReading && (
               <div className="flex items-center justify-center gap-2 pt-1 animate-fadeIn">
                 <button
-                  onClick={() => onShareTarotReading(tarotQuestion, drawnCards)}
+                  onClick={() => onShareTarotReading(tarotQuestion || "General Reading", drawnCards)}
                   className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-black border border-zinc-800 hover:border-[#DC143C]/50 text-xs font-mono uppercase text-zinc-300 hover:text-white transition-all duration-200 cursor-pointer flex items-center gap-1.5 shadow-sm"
                   title="Share reading"
                 >
@@ -221,19 +344,19 @@ export const ThreeCardOracle: React.FC<ThreeCardOracleProps> = ({
 
             <button
               onClick={handleDrawTarot}
-              disabled={isDrawing || !tarotQuestion.trim()}
-              className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-200 cursor-pointer font-google-sans ${
-                tarotQuestion.trim() && !isDrawing
-                  ? 'bg-[#DC143C] text-black hover:bg-[#B81132] hover:text-white shadow-md'
-                  : 'bg-zinc-950 text-zinc-700 cursor-not-allowed border border-zinc-900'
+              disabled={!isDigitalReady}
+              className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-200 font-google-sans border ${
+                isDigitalReady
+                  ? 'bg-black text-[#DC143C] border-[#DC143C] hover:bg-[#DC143C]/10 shadow-[0_0_15px_rgba(220,20,60,0.25)] hover:shadow-[0_0_22px_rgba(220,20,60,0.4)] cursor-pointer'
+                  : 'bg-zinc-950 text-zinc-700 cursor-not-allowed border-zinc-900'
               }`}
             >
-              {isDrawing ? "Drawing Cards..." : "Draw 3 Cards"}
+              {isDrawing ? "Drawing..." : enableFollowUp ? "DRAW (4 CARDS)" : "DRAW"}
             </button>
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className={`grid gap-3 ${enableFollowUp ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-3'}`}>
               <div className="flex flex-col text-left space-y-1">
                 <span className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 font-google-sans">1. Past Energy</span>
                 <select
@@ -314,18 +437,47 @@ export const ThreeCardOracle: React.FC<ThreeCardOracleProps> = ({
                   </optgroup>
                 </select>
               </div>
+
+              {enableFollowUp && (
+                <div className="flex flex-col text-left space-y-1 animate-fadeIn">
+                  <span className="text-[8.5px] uppercase tracking-widest font-bold text-zinc-400 font-google-sans">OUTCOME &amp; RESOLUTIONS</span>
+                  <select
+                    value={physicalFollowUpCard}
+                    onChange={(e) => setPhysicalFollowUpCard(e.target.value)}
+                    disabled={isDrawing}
+                    className="bg-zinc-950 border border-zinc-800 text-zinc-200 text-xs rounded-xl px-3 py-2.5 outline-none w-full font-google-sans focus:border-[#DC143C] cursor-pointer"
+                  >
+                    <option value="">Select Card...</option>
+                    <optgroup label="── Major Arcana ──">
+                      {TAROT_DATABASE.filter(c => c.arcana === 'major').map(c => <option key={c.name} value={c.name}>{c.symbol} {c.name}</option>)}
+                    </optgroup>
+                    <optgroup label="── Suit of Wands (Fire) ──">
+                      {TAROT_DATABASE.filter(c => c.suit === 'wands').map(c => <option key={c.name} value={c.name}>{c.symbol} {c.name}</option>)}
+                    </optgroup>
+                    <optgroup label="── Suit of Cups (Water) ──">
+                      {TAROT_DATABASE.filter(c => c.suit === 'cups').map(c => <option key={c.name} value={c.name}>{c.symbol} {c.name}</option>)}
+                    </optgroup>
+                    <optgroup label="── Suit of Swords (Air) ──">
+                      {TAROT_DATABASE.filter(c => c.suit === 'swords').map(c => <option key={c.name} value={c.name}>{c.symbol} {c.name}</option>)}
+                    </optgroup>
+                    <optgroup label="── Suit of Pentacles (Earth) ──">
+                      {TAROT_DATABASE.filter(c => c.suit === 'pentacles').map(c => <option key={c.name} value={c.name}>{c.symbol} {c.name}</option>)}
+                    </optgroup>
+                  </select>
+                </div>
+              )}
             </div>
 
             <button
               onClick={handlePhysicalSynthesis}
-              disabled={isDrawing || !tarotQuestion.trim() || !physicalPastCard || !physicalPresentCard || !physicalFutureCard}
-              className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-200 cursor-pointer font-google-sans ${
-                tarotQuestion.trim() && !isDrawing && physicalPastCard && physicalPresentCard && physicalFutureCard
-                  ? 'bg-amber-500 text-black hover:bg-amber-600 shadow-md'
-                  : 'bg-zinc-950 text-zinc-700 cursor-not-allowed border border-zinc-900'
+              disabled={!isPhysicalReady}
+              className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-200 font-google-sans border ${
+                isPhysicalReady
+                  ? 'bg-black text-[#DC143C] border-[#DC143C] hover:bg-[#DC143C]/10 shadow-[0_0_15px_rgba(220,20,60,0.25)] hover:shadow-[0_0_22px_rgba(220,20,60,0.4)] cursor-pointer'
+                  : 'bg-zinc-950 text-zinc-700 cursor-not-allowed border-zinc-900'
               }`}
             >
-              {isDrawing ? "Synthesizing Reading..." : "Synthesize Spread"}
+              {isDrawing ? "Synthesizing Reading..." : enableFollowUp ? "Synthesize 4-Card Spread" : "Synthesize Spread"}
             </button>
           </div>
         )}
@@ -333,3 +485,4 @@ export const ThreeCardOracle: React.FC<ThreeCardOracleProps> = ({
     </div>
   );
 };
+

@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { metaphysicalConsultation } from '../services/gemini';
 import { voiceEngine, getSavedVoiceSettings } from '../services/voiceSynthesis';
 import { speechToTextEngine } from '../services/speechToText';
-import { exportToWordDoc, exportToPdf, exportToAudioMp3 } from '../services/exportService';
-import { EsotericWisdomFooter } from './EsotericWisdomFooter';
 import { db } from '../services/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { User } from 'firebase/auth';
@@ -225,9 +223,8 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareContent, setShareContent] = useState<ShareContent | null>(null);
 
-  // Voice Input (STT) & Export states
+  // Voice Input (STT) state
   const [isListening, setIsListening] = useState(false);
-  const [exportNotice, setExportNotice] = useState<string | null>(null);
 
   const activePersonaName = getSavedVoiceSettings().persona;
 
@@ -258,62 +255,6 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
     }
   };
 
-  const handleExportConversationDoc = () => {
-    exportToWordDoc({
-      title: `Conversation with ${activeTarotPersona || activePersonaName}`,
-      persona: activeTarotPersona || activePersonaName,
-      messages: messages.map(m => ({
-        role: m.role,
-        text: m.text,
-        timestamp: m.timestamp
-      }))
-    });
-  };
-
-  const handleExportConversationPdf = () => {
-    exportToPdf({
-      title: `Conversation with ${activeTarotPersona || activePersonaName}`,
-      persona: activeTarotPersona || activePersonaName,
-      messages: messages.map(m => ({
-        role: m.role,
-        text: m.text,
-        timestamp: m.timestamp
-      }))
-    });
-  };
-
-  const handleExportConversationMp3 = async () => {
-    setExportNotice('Exporting MP3 audio...');
-    const voiceSettings = getSavedVoiceSettings();
-    await exportToAudioMp3(
-      {
-        title: `Conversation with ${activeTarotPersona || activePersonaName}`,
-        persona: activeTarotPersona || activePersonaName,
-        userVoiceMode: voiceSettings.userVoiceMode,
-        messages: messages.map(m => ({
-          role: m.role,
-          text: m.text,
-          timestamp: m.timestamp
-        }))
-      },
-      (_, status) => setExportNotice(status)
-    );
-    setTimeout(() => setExportNotice(null), 2500);
-  };
-
-  const handleExportSingleMessage = (text: string, sender: string) => {
-    exportToWordDoc({
-      title: `Oracle Message from ${sender}`,
-      persona: sender,
-      messages: [
-        {
-          role: sender.toLowerCase() === 'user' ? 'user' : 'model',
-          text,
-          timestamp: new Date()
-        }
-      ]
-    });
-  };
 
   const handleCopyText = async (text: string, id?: string) => {
     try {
@@ -356,6 +297,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
   };
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const currentUserRef = useRef<User | null>(null);
   const activeTarotPersonaRef = useRef<string | null>(null);
 
@@ -569,8 +511,8 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
   }, [messages, currentUser]);
 
   useEffect(() => {
-    if (activeView === 'chat') {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (activeView === 'chat' && messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages, isTyping, activeView]);
 
@@ -641,7 +583,12 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
     localStorage.setItem('laevus_transcripts_v1', JSON.stringify(updated));
   };
 
-  const handleSend = async (textToSend: string, forceMode?: 'laevus' | 'tarot' | 'tarot-persona' | 'tarot-physical', customCards?: TarotCard[]) => {
+  const handleSend = async (
+    textToSend: string, 
+    forceMode?: 'laevus' | 'tarot' | 'tarot-persona' | 'tarot-physical', 
+    customCards?: TarotCard[],
+    extraInfo?: { followUpQuestion?: string; primaryQuestion?: string }
+  ) => {
     if (!textToSend.trim() && !customCards) return;
     if (isTyping) return;
 
@@ -703,16 +650,13 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
       localStorage.setItem('laevus_sentiment_timeline', JSON.stringify(newScores));
 
       try {
-        const currentVoiceSettings = getSavedVoiceSettings();
         const reply = await metaphysicalConsultation(
           questionText,
           [],
           {
             mode: 'tarot-persona',
             personaCardName: normalizedCardName,
-            readingCount: nextCount,
-            persona: currentVoiceSettings.persona,
-            affectIntensity: currentVoiceSettings.affectIntensity
+            readingCount: nextCount
           }
         );
 
@@ -782,30 +726,41 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
 
       const currentVoiceSettings = getSavedVoiceSettings();
       let reply = "";
+      const effectiveQuestion = extraInfo?.primaryQuestion || tarotQuestion || "General alignment";
+      const effectiveFollowUp = extraInfo?.followUpQuestion;
+
       if (currentMode === 'tarot' && customCards) {
+        const promptText = effectiveFollowUp
+          ? `Tailor a tarot reading for inquiry: "${effectiveQuestion}" and follow-up question: "${effectiveFollowUp}"`
+          : `Tailor a tarot reading for my question: "${effectiveQuestion}"`;
+
         reply = await metaphysicalConsultation(
-          `Tailor a 3-card reading for my question: "${tarotQuestion || "My spiritual destiny"}"`,
+          promptText,
           formattedHistory,
           {
             mode: 'tarot',
             tarotCards: customCards,
-            tarotQuestion: tarotQuestion || "General alignment",
+            tarotQuestion: effectiveQuestion,
+            followUpQuestion: effectiveFollowUp,
             readingCount: nextCount,
-            persona: currentVoiceSettings.persona,
-            affectIntensity: currentVoiceSettings.affectIntensity
+            persona: currentVoiceSettings.persona
           }
         );
       } else if (currentMode === 'tarot-physical' && customCards) {
+        const promptText = effectiveFollowUp
+          ? `Synthesize an Offline reading for inquiry: "${effectiveQuestion}" and follow-up question: "${effectiveFollowUp}"`
+          : `Synthesize an Offline reading for my question: "${effectiveQuestion}"`;
+
         reply = await metaphysicalConsultation(
-          `Synthesize a Physical Realm Three-Card reading for my question: "${tarotQuestion || "General life alignment"}"`,
+          promptText,
           formattedHistory,
           {
             mode: 'tarot-physical',
             tarotCards: customCards,
-            tarotQuestion: tarotQuestion || "General alignment",
+            tarotQuestion: effectiveQuestion,
+            followUpQuestion: effectiveFollowUp,
             readingCount: nextCount,
-            persona: currentVoiceSettings.persona,
-            affectIntensity: currentVoiceSettings.affectIntensity
+            persona: currentVoiceSettings.persona
           }
         );
       } else if (currentMode === 'tarot-persona' && activeTarotPersona) {
@@ -816,8 +771,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
             mode: 'tarot-persona',
             personaCardName: activeTarotPersona,
             readingCount: nextCount,
-            persona: currentVoiceSettings.persona,
-            affectIntensity: currentVoiceSettings.affectIntensity
+            persona: currentVoiceSettings.persona
           }
         );
       } else {
@@ -827,8 +781,7 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
           {
             mode: 'laevus',
             readingCount: nextCount,
-            persona: currentVoiceSettings.persona,
-            affectIntensity: currentVoiceSettings.affectIntensity
+            persona: currentVoiceSettings.persona
           }
         );
       }
@@ -1061,49 +1014,12 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
             </div>
           )}
 
-          {/* Conversation Actions & Status Bar */}
-          <div className="flex items-center justify-between px-2 py-1 border-b border-zinc-900/60 text-[10px] font-mono text-zinc-500 select-none">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <span className="uppercase tracking-widest text-zinc-400 font-medium">
-                {exportNotice || 'Dialogue Ledger'}
-              </span>
-              <span className="text-zinc-700 hidden sm:inline">•</span>
-              <button 
-                onClick={() => setActiveView('voice-settings')}
-                className="hidden sm:inline-flex items-center gap-1.5 text-[9px] uppercase tracking-wider text-zinc-400 hover:text-[#DC143C] transition-colors cursor-pointer"
-                title="Configure Persona Voice & Affect Intensity"
-              >
-                <span>Voice: {activePersonaName}</span>
-                <span className="text-[#DC143C] font-semibold">({Math.round((voiceSettings.affectIntensity ?? 0.85) * 100)}% Affect)</span>
-              </button>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleExportConversationMp3}
-                className="px-2 py-0.5 rounded bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer uppercase text-[9px]"
-                title="Export voice dialogue as MP3"
-              >
-                Export MP3
-              </button>
-              <button
-                onClick={handleExportConversationDoc}
-                className="px-2 py-0.5 rounded bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer uppercase text-[9px]"
-                title="Export dialogue as Word Document"
-              >
-                Export DOC
-              </button>
-              <button
-                onClick={handleExportConversationPdf}
-                className="px-2 py-0.5 rounded bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer uppercase text-[9px]"
-                title="Export dialogue as PDF"
-              >
-                Export PDF
-              </button>
-            </div>
-          </div>
 
           {/* Messages Ledger */}
-          <div className="flex-1 py-2 overflow-y-auto space-y-3 border-b border-zinc-900/40 min-h-0">
+          <div 
+            ref={messagesContainerRef}
+            className="flex-1 py-2 overflow-y-auto space-y-2 border-b border-zinc-900/40 min-h-0"
+          >
             {messages.map((m) => {
                const isUser = m.role === 'user';
                return (
@@ -1112,21 +1028,21 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                    className={`flex flex-col ${isUser ? 'max-w-[85%] ml-auto items-end' : 'w-full mr-auto items-start'}`}
                  >
                    <div className="w-full flex items-center justify-between text-[9px] font-mono text-zinc-500 mb-1 px-1 tracking-wider uppercase font-google-sans">
-                     <span>
-                       {isUser 
-                         ? 'YOU' 
-                         : activeTarotPersona 
-                         ? activeTarotPersona.toUpperCase() 
-                         : `${activePersonaName.toUpperCase()} (${Math.round((voiceSettings.affectIntensity ?? 0.85) * 100)}% AFFECT)`} • {m.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                     </span>
+                     <span>{isUser ? 'YOU' : activeTarotPersona ? activeTarotPersona.toUpperCase() : activePersonaName.toUpperCase()} • {m.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                      {!isUser && (
-                       <span className="font-bold text-zinc-400 tracking-widest">ORACLE</span>
+                       <button
+                         onClick={() => handleShareOracleMessage(m.text)}
+                         className="text-[9px] font-mono tracking-wider text-zinc-500 hover:text-[#DC143C] transition-colors cursor-pointer uppercase font-google-sans"
+                         title="Share reflection"
+                       >
+                         SHARE
+                       </button>
                      )}
                    </div>
                    <div className={`px-4 py-3 rounded-xl leading-relaxed text-xs select-text cursor-text selection:bg-purple-900/50 selection:text-purple-200 ${
                      isUser 
                        ? 'bg-zinc-900 text-[#F8F7F4]' 
-                       : 'bg-zinc-950 text-[#F8F7F4] w-full border border-zinc-900/50'
+                       : 'bg-zinc-950 text-[#F8F7F4] w-full border border-zinc-900/50 min-h-[7.5rem]'
                    }`}>
                      {isUser ? (
                        <p className="whitespace-pre-wrap font-google-sans select-text cursor-text">{m.text}</p>
@@ -1134,33 +1050,14 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
                        <TypewriterText text={m.text} />
                      )}
                    </div>
-
-                   {/* Action buttons: Share & Export */}
-                   <div className="flex items-center gap-1.5 mt-1 px-1 opacity-80 hover:opacity-100 transition-opacity">
-                     <button
-                       onClick={() => handleShareOracleMessage(m.text)}
-                       className="text-[9px] font-mono text-zinc-500 hover:text-[#DC143C] transition-colors cursor-pointer px-2 py-0.5 rounded bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-900 hover:border-zinc-800 uppercase"
-                       title="Share reflection"
-                     >
-                       Share
-                     </button>
-                     <button
-                       onClick={() => handleExportSingleMessage(m.text, isUser ? 'User' : activePersonaName)}
-                       className="text-[9px] font-mono text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer px-2 py-0.5 rounded bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-900 hover:border-zinc-800 uppercase"
-                       title="Export text document"
-                     >
-                       Export DOC
-                     </button>
-                   </div>
                  </div>
                );
             })}
             
             {isTyping && (
               <div className="w-full mr-auto flex flex-col">
-                <div className="w-full flex items-center justify-between text-[9px] font-mono text-zinc-500 mb-1 px-1 tracking-wider uppercase font-google-sans">
+                <div className="w-full flex items-center text-[9px] font-mono text-zinc-500 mb-1 px-1 tracking-wider uppercase font-google-sans">
                   <span>{activeTarotPersona ? activeTarotPersona.toUpperCase() : activePersonaName.toUpperCase()}</span>
-                  <span className="font-bold text-zinc-400 tracking-widest">ORACLE</span>
                 </div>
                 <div className="flex items-center gap-2 bg-zinc-950 px-4 py-3 rounded-xl w-full border border-zinc-900/50">
                   <span className="w-2 h-2 rounded-full bg-[#DC143C] animate-ping" />
@@ -1192,25 +1089,33 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
               <button
                 type="button"
                 onClick={handleToggleVoiceInput}
-                className={`px-3 py-2.5 rounded-lg text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer border ${
-                  isListening
-                    ? 'bg-[#DC143C] text-white border-[#DC143C] animate-pulse'
-                    : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-700'
-                }`}
+                className={isListening 
+                  ? 'p-2.5 rounded-lg text-xs transition-all cursor-pointer border flex items-center justify-center shrink-0 bg-[#DC143C] text-white border-[#DC143C] animate-pulse shadow-[0_0_12px_rgba(220,20,60,0.5)]' 
+                  : 'p-2.5 rounded-lg text-xs transition-all cursor-pointer border flex items-center justify-center shrink-0 bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-[#DC143C] hover:border-[#DC143C]/60 hover:bg-zinc-850 active:text-[#DC143C] active:border-[#DC143C]'
+                }
                 title="Dictate with voice"
+                aria-label="Dictate with voice"
               >
-                {isListening ? 'Stop' : 'Voice'}
+                <svg className="w-4 h-4 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" x2="12" y1="19" y2="22" />
+                </svg>
               </button>
               <button
                 onClick={() => handleSend(input)}
                 disabled={!input.trim() || isTyping}
-                className={`px-4 py-2.5 rounded-lg transition-all ${
-                  input.trim() && !isTyping
-                    ? 'bg-[#DC143C] hover:bg-[#B81132] text-white cursor-pointer font-bold text-xs'
-                    : 'bg-zinc-900 text-zinc-700 cursor-not-allowed text-xs'
-                }`}
+                className={input.trim() && !isTyping 
+                  ? 'p-2.5 rounded-lg transition-all flex items-center justify-center shrink-0 bg-[#DC143C] hover:bg-[#B81132] text-white cursor-pointer shadow-[0_0_12px_rgba(220,20,60,0.5)] border border-[#DC143C]' 
+                  : 'p-2.5 rounded-lg transition-all flex items-center justify-center shrink-0 bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-[#DC143C] hover:border-[#DC143C]/60 hover:bg-zinc-850 active:text-[#DC143C] active:border-[#DC143C] cursor-pointer'
+                }
+                title="Send message"
+                aria-label="Send message"
               >
-                Send
+                <svg className="w-4 h-4 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="19" x2="12" y2="5" />
+                  <polyline points="5 12 12 5 19 12" />
+                </svg>
               </button>
             </div>
           </div>
@@ -1223,9 +1128,9 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
           initialTab="oracle"
           onReturnToChat={() => setActiveView('chat')}
           onStartSeanceWithCard={handleStartEncyclopediaConversation}
-          onStartReading={(prompt, mode, cards) => {
+          onStartReading={(prompt, mode, cards, extra) => {
             setActiveView('chat');
-            handleSend(prompt, mode, cards);
+            handleSend(prompt, mode, cards, extra);
           }}
           onShareTarotReading={handleShareTarotReading}
         />
@@ -1251,16 +1156,26 @@ export const LaevusChat: React.FC<LaevusChatProps> = ({
           initialTab="encyclopedia"
           onReturnToChat={() => setActiveView('chat')}
           onStartSeanceWithCard={handleStartEncyclopediaConversation}
-          onStartReading={(prompt, mode, cards) => {
+          onStartReading={(prompt, mode, cards, extra) => {
             setActiveView('chat');
-            handleSend(prompt, mode, cards);
+            handleSend(prompt, mode, cards, extra);
           }}
           onShareTarotReading={handleShareTarotReading}
         />
       )}
 
       {/* ESOTERIC WISDOM FOOTER WITH QUOTE ROTATION */}
-      <EsotericWisdomFooter onOpenAbout={() => setShowAboutModal(true)} />
+      {/* MINIMAL FOOTER */}
+      <footer className="w-full border-t border-[#F8F7F4]/5 pt-2 pb-1 mt-3 flex flex-col justify-between items-center text-[9px] tracking-[0.15em] font-mono text-zinc-600 uppercase shrink-0 gap-2">
+        <div className="flex flex-col sm:flex-row justify-center items-center w-full gap-2">
+          <button 
+            onClick={() => setShowAboutModal(true)}
+            className="hover:text-[#DC143C] text-center transition-colors duration-300 focus:outline-none cursor-pointer border-b border-transparent hover:border-[#DC143C]/40 pb-0.5 font-bold bg-zinc-950 px-3 py-1.5 rounded font-google-sans"
+          >
+            All rights reserved "Left Hand Products LLC" 2026
+          </button>
+        </div>
+      </footer>
 
       {/* ESOTERIC ABOUT US MODAL */}
       {showAboutModal && (

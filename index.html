@@ -83,6 +83,25 @@
         scroll-behavior: smooth;
       }
 
+      /* Dripping blood / dark fluid fill down animation */
+      @keyframes rushDripDown {
+        0% {
+          background-position: 0 0%;
+        }
+        100% {
+          background-position: 0 100%;
+        }
+      }
+
+      .animate-drip-black {
+        background: linear-gradient(180deg, #09090b 0%, #09090b 50%, #DC143C 50%, #DC143C 100%);
+        background-size: 100% 200%;
+        background-position: 0 0%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: rushDripDown 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
       ::selection {
         background-color: rgba(88, 28, 135, 0.5);
         color: rgb(233, 213, 255);

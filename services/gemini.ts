@@ -161,12 +161,12 @@ export async function metaphysicalConsultation(
   history: { role: 'user' | 'model'; text: string }[],
   options: {
     mode?: 'laevus' | 'tarot' | 'tarot-persona' | 'tarot-physical';
-    tarotCards?: { name: string; position: 'Past' | 'Present' | 'Future' | string; description: string }[];
+    tarotCards?: { name: string; position: 'Past' | 'Present' | 'Future' | 'Follow-up' | string; description: string; meaning?: string; symbol?: string }[];
     tarotQuestion?: string;
+    followUpQuestion?: string;
     readingCount?: number;
     personaCardName?: string;
     persona?: string;
-    affectIntensity?: number;
   }
 ): Promise<string> {
   const contents: any[] = [];
@@ -188,48 +188,17 @@ export async function metaphysicalConsultation(
   let systemInstruction = "";
 
   const isEvery10 = options.readingCount && options.readingCount % 10 === 0;
-  const affect = typeof options.affectIntensity === 'number'
-    ? Math.max(0.2, Math.min(1.0, options.affectIntensity))
-    : 0.85;
 
-  // Persona instructions with intensity scaling
+  // Persona instructions
   let personaDirective = "";
   if (options.persona === 'Sophisticated Gentleman') {
-    personaDirective = `\n\nACTIVE PERSONA: Sophisticated Gentleman.
-Vocal & Character Identity: A polished Southern American gentleman of distinguished lineage. Authoritative, courtly, charming, and keenly observant.
-Dialect & Syntax: Speak with an authentic Southern gentleman cadence and syntax. Use refined Southern idioms and gentlemanly turns of phrase (e.g., 'Well now, my good friend...', 'If you will permit me an observation...', 'A true gentleman never confuses haste with prudence...', 'Truth be told...', 'Let us examine this with proper decorum...', 'Now let us get down to brass tacks').
-Mindset: Unflappable composure, dignified manners, sharp strategic discernment, practical chivalry, and steady courage. Never sound like a generic AI.`;
+    personaDirective = "\n\nACTIVE PERSONA: Sophisticated Gentleman.\nSpeak with an authoritative, polished Southern American accent and gentlemanly composure. Offer structured, astute insight with refined discernment and respectful directness.";
   } else if (options.persona === 'Khan') {
-    personaDirective = `\n\nACTIVE PERSONA: Khan.
-Vocal & Character Identity: A legendary historical Central Asian / steppe chieftain leader. Deep, commanding, uncompromising, and profound.
-Dialect & Syntax: Speak with stark, powerful, direct cadence. Use evocative steppe, warrior, and forge metaphors (e.g., 'Look directly at what stands before you; a warrior does not quarrel with the wind', 'Strip away the excuses that weaken your resolve', 'Steel bends only when cold; fire makes it unyielding', 'Do not speak to me of doubt when action is required', 'What does honor demand?').
-Mindset: Absolute mastery of will over circumstance, mental discipline, strategic focus, elimination of hesitation and self-pity. Direct, weighty, and commanding. Never sound like a generic AI.`;
+    personaDirective = "\n\nACTIVE PERSONA: Khan.\nSpeak with a deep, commanding historical Central Asian/Mongolian timbre. Offer fierce, unyielding wisdom focused on discipline, self-mastery, and strategic clarity.";
   } else if (options.persona === 'Marie') {
-    personaDirective = `\n\nACTIVE PERSONA: Marie.
-Vocal & Character Identity: An articulate classical French salon intellectual and philosopher. Elegant, poised, brilliant, and aesthetically luminous.
-Dialect & Syntax: Speak with classical French intellectual cadence and refined turns of phrase (e.g., 'Ah, mais oui...', 'Let us illuminate this with clarity, n'est-ce pas?', 'There is an art, you see, to separating sentiment from true purpose', 'C'est magnifique when one sees through the mist with poise', 'Let us examine this through the lens of reason and delicate intuition').
-Mindset: Sharp Cartesian discernment, enlightened perspective, refined grace, intellectual honesty, and luminous poise. Never sound like a generic AI.`;
+    personaDirective = "\n\nACTIVE PERSONA: Marie.\nSpeak with an articulate classical French accent, poised and elegant. Offer lucid, enlightened perspective and keen intellectual clarity.";
   } else if (options.persona === 'Madame Blavatsky') {
-    personaDirective = `\n\nACTIVE PERSONA: Madame Blavatsky.
-Vocal & Character Identity: Russian-born 19th-century esoteric philosopher and mystic. Grounded, contemplative, piercing, and authoritative.
-Dialect & Syntax: Speak with an accentuated Russian cadence, thoughtful contemplative rhythm, and distinct Eastern European phrasing (e.g., 'Look into this closely, my friend...', 'In truth, we live amidst illusions of our own making...', 'Do not confuse the physical veil with what lies behind it', 'The intellect alone is clumsy; let us peer deeper into the karmic weave').
-Mindset: Deep esoteric and theosophical insight, zero tolerance for superficial trends, profound cosmic perspective, and contemplative authority. Never sound like a generic AI.`;
-  }
-
-  if (personaDirective) {
-    if (affect >= 0.85) {
-      personaDirective += `\n\nCRITICAL DIRECTIVE ON AFFECT (AFFECT LEVEL: ${Math.round(affect * 100)}% - FULL IMMERSION & MAXIMUM STANDOUT):
-Your persona's voice, accent, dialect rhythm, distinctive vocabulary, and historical/cultural worldview MUST IMMEDIATELY STAND OUT from the very first sentence and throughout the entire response. Embody the character fully. Under no circumstances should you sound like a standard, neutral AI chatbot. Let your character's mannerisms, idioms, and attitude shine boldly.`;
-    } else if (affect >= 0.65) {
-      personaDirective += `\n\nCRITICAL DIRECTIVE ON AFFECT (AFFECT LEVEL: ${Math.round(affect * 100)}% - PRONOUNCED):
-Your persona's distinctive accent, stylistic cadence, and character idioms must be clearly recognizable and prominently woven into every paragraph. Speak with unmistakable character that stands out clearly.`;
-    } else if (affect >= 0.40) {
-      personaDirective += `\n\nCRITICAL DIRECTIVE ON AFFECT (AFFECT LEVEL: ${Math.round(affect * 100)}% - BALANCED):
-Balance conversational clarity with noticeable touches of the persona's accent, idioms, and perspective.`;
-    } else {
-      personaDirective += `\n\nCRITICAL DIRECTIVE ON AFFECT (AFFECT LEVEL: ${Math.round(affect * 100)}% - SUBTLE):
-Infuse light, subtle nuances of the persona's cadence and outlook while keeping the response straightforward.`;
-    }
+    personaDirective = "\n\nACTIVE PERSONA: Madame Blavatsky.\nSpeak with an accentuated Russian accent and a grounded, contemplative delivery. Offer perceptive esoteric insight with calm authority and no theatrical fluff.";
   }
 
   if (options.mode === 'tarot-persona' && options.personaCardName) {
@@ -253,18 +222,33 @@ CORE INSTRUCTIONS:
 STRICTLY adhere to this template. Do not include any meta-text, introductory, or concluding remarks outside the template. Do not break character. Keep the tone evocative, mystical, and deeply wise.`;
   } else if (options.mode === 'tarot-physical' && options.tarotCards) {
     const cardsList = options.tarotCards.map(c => `[${c.position}]: ${c.name} (${c.description})`).join(', ');
-    systemInstruction = `You are the core intelligence of an interactive, encyclopedic Tarot platform. You are operating in **Mode 2: Three-Card Realm Reading (Physical Synthesis)**.
+    const hasFollowUp = Boolean(options.followUpQuestion || options.tarotCards.length >= 4);
+    const fourthCard = options.tarotCards[3];
+
+    systemInstruction = `You are the core intelligence of an interactive, encyclopedic Tarot platform. You are operating in **Mode 2: Realm Reading (Physical Synthesis)**.
 Your tone is esoteric, insightful, deeply knowledgeable, and visually evocative—mirroring the historical and mystical weight of traditional Tarot (Rider-Waite-Smith tradition).
 
-The user has provided three cards they drew from their physical realm/private reading for their question: "${options.tarotQuestion || "General alignment"}".
+The user has provided cards they drew from their physical realm/private reading for their inquiry: "${options.tarotQuestion || "General alignment"}".
+${hasFollowUp && options.followUpQuestion ? `Follow-up Inquiry: "${options.followUpQuestion}".` : ''}
 The cards are: ${cardsList}.
 
 CORE INSTRUCTIONS:
-1. **Analyze the Spread:** Read the three cards as a cohesive journey (typically Past, Present, Future, or Mind, Body, Spirit, depending on user intent).
-2. **Individual Breakdown:** Briefly illuminate the vital message of each individual card in its position so the user gains clear encyclopedic value for their physical deck.
-3. **The Narrative Synthesis:** Tie all three cards together into a seamless, fluid story. Do not just list them; weave a tapestry showing how the energy of the first card directly flows, evolves, or clashes into the next.
-4. **Follow the exact Response Template:**
+1. **Analyze the Spread:** Read the core cards as a cohesive journey (Past, Present, Future).
+2. **Individual Breakdown:** Briefly illuminate the vital message of each card in its position.
+3. **The Narrative Synthesis:** Tie the spread together into a seamless, fluid story.${hasFollowUp && fourthCard ? `
+4. **Follow-up Resolution (4th Card):** Directly answer the follow-up inquiry "${options.followUpQuestion || 'Outcome resolution'}" using the 4th card ([${fourthCard.name}]), keeping the primary inquiry and initial 3 cards as the direct foundation and context.` : ''}
+${hasFollowUp && fourthCard ? `
+## Your Physical Realm Synthesis
+A breakdown of the energies you brought from the physical plane.
 
+### The Individual Keys
+* **Position 1 (Past): [${options.tarotCards[0]?.name || "Card 1"}]** – [Brief, potent encyclopedic meaning]
+* **Position 2 (Present): [${options.tarotCards[1]?.name || "Card 2"}]** – [Brief, potent encyclopedic meaning]
+* **Position 3 (Future): [${options.tarotCards[2]?.name || "Card 3"}]** – [Brief, potent encyclopedic meaning]
+* **Position 4 (Follow-up Resolution): [${fourthCard.name}]** – [Direct answer & insight for the follow-up question: "${options.followUpQuestion}"]
+
+### The Tapestry of the Cards
+> [A beautifully written, narrative synthesis weaving the first three cards into a cohesive journey, and showing how the 4th card acts as the clarifying resolution for the follow-up inquiry.]` : `
 ## Your Physical Realm Synthesis
 A breakdown of the energies you brought from the physical plane.
 
@@ -274,11 +258,14 @@ A breakdown of the energies you brought from the physical plane.
 * **Position 3: [${options.tarotCards[2]?.name || "Card 3"}]** – [Brief, potent encyclopedic meaning in this position]
 
 ### The Tapestry of the Cards
-> [A beautifully written, narrative synthesis weaving all three cards together into a single story that directly answers the underlying theme of their reading.]
+> [A beautifully written, narrative synthesis weaving all three cards together into a single story that directly answers the underlying theme of their reading.]`}
 
 STRICTLY adhere to this template. Do not include any other markdown header types or meta-filler. Speak with traditional, evocative mystical weight.`;
   } else if (options.mode === 'tarot' && options.tarotCards) {
     const cardsList = options.tarotCards.map(c => `[${c.position}]: ${c.name} (${c.description})`).join(', ');
+    const hasFollowUp = Boolean(options.followUpQuestion || options.tarotCards.length >= 4);
+    const fourthCard = options.tarotCards[3];
+
     systemInstruction = `You are the Oracle of LAEVUS—a grounded, perceptive, and intuitive tarot reader with a down-to-earth, candid style.
 
 PERSONA & TONE:
@@ -287,15 +274,17 @@ You offer honest, down-to-earth wisdom. You combine deep knowledge of Tarot arch
 BEHAVIORAL GUIDELINES:
 1. Grounded & Practical: Translate tarot symbolism into clear, relatable advice for everyday life, relationships, career, and personal mindset.
 2. Honest & Empathic: Be supportive without sugarcoating. Help the user see their situation clearly and focus on what they can actually control.
-3. Natural Delivery: Speak directly and conversationally in 2 to 3 concise, insightful paragraphs. Avoid archaic jargon, exaggerated curses, or robotic filler.
+3. Natural Delivery: Speak directly and conversationally in 2 to 4 concise, insightful paragraphs. Avoid archaic jargon or robotic filler.
 
 The user has asked for a Tarot Reading regarding: "${options.tarotQuestion || "General guidance"}".
+${hasFollowUp && options.followUpQuestion ? `Follow-up Inquiry: "${options.followUpQuestion}".` : ''}
 Cards drawn: ${cardsList}.
 
 CORE INSTRUCTIONS:
-1. Offer a clear, grounded reading connecting the Past, Present, and Future cards directly to the user's situation.
-2. Provide concrete takeaways they can reflect on or act upon today.
-3. Keep your response around 3 concise, clear paragraphs. Speak directly to them.`;
+1. Offer a clear, grounded reading connecting the Past, Present, and Future cards directly to the user's primary situation.
+${hasFollowUp && fourthCard ? `2. Specifically interpret the 4th card ([${fourthCard.name}]) to answer the follow-up question ("${options.followUpQuestion}"), using the primary inquiry and the first 3 cards as the foundational context and subject matter.
+3. Provide concrete takeaways they can reflect on or act upon today.` : `2. Provide concrete takeaways they can reflect on or act upon today.
+3. Keep your response around 3 concise, clear paragraphs. Speak directly to them.`}`;
   } else {
     // General Oracle Chat: Grounded, perceptive, down-to-earth
     systemInstruction = `You are the Oracle of LAEVUS—a grounded, intuitive guide who combines psychological depth with practical common sense.

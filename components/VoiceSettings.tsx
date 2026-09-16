@@ -62,22 +62,13 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
     const next: VoiceSettingsType = {
       ...settings,
       pitch: profile.defaultPitch,
-      speed: profile.defaultSpeed,
-      affectIntensity: 0.85
+      speed: profile.defaultSpeed
     };
     setSettings(next);
     saveVoiceSettings(next);
   };
 
   const activeProfile = PERSONA_PROFILES[settings.persona] || PERSONA_PROFILES['Madame Blavatsky'];
-
-  const getAffectSampleQuote = (profile: typeof activeProfile, affect: number) => {
-    if (!profile.sampleQuotes) return profile.testPhrase;
-    if (affect >= 0.86) return profile.sampleQuotes.immersion;
-    if (affect >= 0.66) return profile.sampleQuotes.pronounced;
-    if (affect >= 0.40) return profile.sampleQuotes.balanced;
-    return profile.sampleQuotes.subtle;
-  };
 
   // Four personas in exact 2x2 grid positions
   const personaList: PersonaId[] = [
@@ -227,115 +218,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({ onReturnToChat }) 
           </div>
         </div>
 
-        {/* Section 2: Affect (How Much) - Persona Accent & Standout Intensity */}
-        <div className="space-y-4 pb-5 border-b border-zinc-900">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-200">
-                  Affect (How Much)
-                </span>
-                <span className="text-[10px] font-mono text-[#DC143C] font-semibold tracking-wide">
-                  Standout Factor
-                </span>
-              </div>
-              <p className="text-xs text-zinc-400 mt-0.5">
-                Adjusts how intensely the persona's accent, vernacular, cadence, and worldview stand out in dialogue and spoken audio.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 self-start sm:self-auto">
-              <span className="text-xs font-mono font-bold text-[#DC143C] bg-zinc-950 px-2.5 py-1 rounded border border-zinc-800">
-                {Math.round(settings.affectIntensity * 100)}%
-              </span>
-              <span className="text-[10px] font-mono uppercase text-zinc-400 tracking-wider">
-                {settings.affectIntensity >= 0.86
-                  ? 'Full Immersion'
-                  : settings.affectIntensity >= 0.66
-                  ? 'Pronounced'
-                  : settings.affectIntensity >= 0.40
-                  ? 'Balanced'
-                  : 'Subtle'}
-              </span>
-            </div>
-          </div>
-
-          {/* Slider */}
-          <div className="space-y-2">
-            <input
-              type="range"
-              min="0.2"
-              max="1.0"
-              step="0.05"
-              value={settings.affectIntensity}
-              onChange={(e) => handleUpdate({ affectIntensity: parseFloat(e.target.value) })}
-              className="w-full accent-[#DC143C] bg-zinc-900 h-1.5 rounded-lg appearance-none cursor-pointer"
-            />
-            <div className="flex justify-between text-[9px] font-mono text-zinc-600 uppercase">
-              <span>20% Subtle Nuance</span>
-              <span>50% Balanced</span>
-              <span>75% Pronounced</span>
-              <span>100% Maximum Standout</span>
-            </div>
-          </div>
-
-          {/* Preset Buttons */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-            {[
-              { label: 'Subtle', pct: 0.25, desc: 'Gentle cadence & nuance' },
-              { label: 'Balanced', pct: 0.50, desc: 'Natural accent & style' },
-              { label: 'Pronounced', pct: 0.75, desc: 'Vivid, prominent presence' },
-              { label: 'Full Immersion', pct: 1.00, desc: 'Maximum standout character' }
-            ].map((preset) => {
-              const isActive = Math.abs(settings.affectIntensity - preset.pct) < 0.08;
-              return (
-                <button
-                  key={preset.label}
-                  onClick={() => handleUpdate({ affectIntensity: preset.pct })}
-                  className={`p-2.5 rounded-lg border text-left transition-colors cursor-pointer ${
-                    isActive
-                      ? 'bg-zinc-950 border-[#DC143C] text-white ring-1 ring-[#DC143C]/40'
-                      : 'bg-black border-zinc-900 text-zinc-400 hover:border-zinc-800 hover:text-zinc-200'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold uppercase">{preset.label}</span>
-                    <span className="text-[10px] font-mono text-[#DC143C] font-semibold">{Math.round(preset.pct * 100)}%</span>
-                  </div>
-                  <div className="text-[10px] text-zinc-500 mt-0.5">{preset.desc}</div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Standout Dialogue Sample Preview */}
-          <div className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-900/80 space-y-2">
-            <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
-              <span className="uppercase tracking-wider font-semibold text-zinc-300">
-                Live Audition: {activeProfile.title}
-              </span>
-              <button
-                onClick={() => {
-                  const phrase = getAffectSampleQuote(activeProfile, settings.affectIntensity);
-                  voiceEngine.testVoice(settings, phrase);
-                }}
-                disabled={!settings.enabled}
-                className={`px-2.5 py-1 rounded border uppercase transition-colors cursor-pointer text-[9px] font-mono font-bold tracking-wider ${
-                  !settings.enabled
-                    ? 'bg-zinc-900 text-zinc-600 border-zinc-900 cursor-not-allowed'
-                    : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-[#DC143C] hover:text-white'
-                }`}
-              >
-                Audition Spoken Affect
-              </button>
-            </div>
-            <p className="text-xs italic text-zinc-300 leading-relaxed font-google-sans">
-              "{getAffectSampleQuote(activeProfile, settings.affectIntensity)}"
-            </p>
-          </div>
-        </div>
-
-        {/* Section 3: Pitch and Cadence Modulation Sliders */}
+        {/* Section 2: Pitch and Cadence Modulation Sliders */}
         <div className="space-y-4 pb-5 border-b border-zinc-900">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-200">

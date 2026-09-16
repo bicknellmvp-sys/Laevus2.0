@@ -62,6 +62,8 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
   // Dynamic feature checkboxes
   const [attachQuestion, setAttachQuestion] = useState(false);
   const [customQuestion, setCustomQuestion] = useState('');
+  const [enableFollowUp, setEnableFollowUp] = useState(false);
+  const [followUpQuestion, setFollowUpQuestion] = useState('');
 
   const [includeInsightCard, setIncludeInsightCard] = useState(false);
 
@@ -263,7 +265,7 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
         ? customQuestion.trim()
         : "Synthesize the deep esoteric trajectory and weave a narrative tapestry for these physical realm cards.";
 
-      const currentVoiceSettings = getSavedVoiceSettings();
+      const effectiveFollowUp = enableFollowUp && followUpQuestion.trim() ? followUpQuestion.trim() : undefined;
 
       const reply = await metaphysicalConsultation(
         `Synthesize this physical realm Tarot spread: "${queryPrompt}"`,
@@ -272,15 +274,15 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
           mode: 'tarot-physical',
           tarotCards: drawnCards,
           tarotQuestion: queryPrompt,
-          readingCount: 1,
-          persona: currentVoiceSettings.persona,
-          affectIntensity: currentVoiceSettings.affectIntensity
+          followUpQuestion: effectiveFollowUp,
+          readingCount: 1
         }
       );
 
       setGeneratedReading(reply);
 
       // Capture voice settings active at time of synthesis
+      const currentVoiceSettings = getSavedVoiceSettings();
       setActiveReadingVoiceSettings(currentVoiceSettings);
 
       // Persist to Past Spread Readings storage
@@ -782,85 +784,82 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
 
     </div>
 
-      {/* DYNAMIC CHECKBOXES & OPTIONS (Below Card Slots) */}
-      <div className="bg-black border border-zinc-900 rounded-2xl p-5 mb-8 space-y-4 shadow-xl">
+      {/* DYNAMIC CHECKBOXES & INQUIRY (Below Card Slots) */}
+      <div className="bg-black border border-zinc-900 rounded-2xl p-5 mb-8 space-y-3.5 shadow-xl">
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          {/* Checkbox 1: Attach Specific Question */}
-          <div 
-            onClick={() => setAttachQuestion(!attachQuestion)}
-            className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
-              attachQuestion 
-                ? 'bg-zinc-950 border-[#DC143C]/50 shadow-[0_0_15px_rgba(220,20,60,0.1)]' 
-                : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-800'
-            }`}
-          >
-            <div className={`w-5 h-5 rounded mt-0.5 flex items-center justify-center border transition-all text-xs font-bold ${
-              attachQuestion 
-                ? 'bg-[#DC143C] border-[#DC143C] text-white' 
-                : 'border-zinc-700 bg-zinc-900'
-            }`}>
-              {attachQuestion && '✓'}
-            </div>
+        {/* Inquiry Box with Checkboxes on top */}
+        <div>
+          <div className="flex items-center justify-between gap-3 mb-1 flex-wrap">
+            <label className="text-[8.5px] uppercase font-mono tracking-widest text-zinc-400 font-bold block">
+              INQUIRY OR FOCUS
+            </label>
+            <div className="flex items-center gap-3">
+              {/* Checkbox 1: Enable inquiry box */}
+              <label className="group flex items-center gap-1 cursor-pointer text-[8.5px] uppercase font-bold tracking-wider text-zinc-400 hover:text-[#DC143C] active:text-[#DC143C] select-none transition-colors">
+                <input
+                  type="checkbox"
+                  checked={attachQuestion}
+                  onChange={(e) => {
+                    setAttachQuestion(e.target.checked);
+                    if (!e.target.checked) setCustomQuestion('');
+                  }}
+                  className="accent-[#DC143C] w-3 h-3 rounded cursor-pointer transition-all duration-150 hover:brightness-125 focus:ring-2 focus:ring-[#DC143C] focus:ring-offset-1 focus:ring-offset-black active:scale-95"
+                />
+                <span className={`transition-colors group-hover:text-[#DC143C] ${attachQuestion ? 'text-[#DC143C]' : 'text-zinc-500'}`}>
+                  Enable Inquiry
+                </span>
+              </label>
 
-            <div>
-              <h4 className="text-xs font-bold text-zinc-200 uppercase tracking-wider font-google-sans">
-                Attach Specific Question
-              </h4>
-              <p className="text-[10px] text-zinc-500 mt-0.5">
-                Imbue the reading with a specific inquiry or focus topic you held while shuffling.
-              </p>
-            </div>
-          </div>
-
-          {/* Checkbox 2: 4th Insight Card */}
-          <div 
-            onClick={() => {
-              const next = !includeInsightCard;
-              setIncludeInsightCard(next);
-              if (next && !slots.slotD) {
-                setActiveSlot('slotD');
-              }
-            }}
-            className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
-              includeInsightCard 
-                ? 'bg-zinc-950 border-[#DC143C]/50 shadow-[0_0_15px_rgba(220,20,60,0.1)]' 
-                : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-800'
-            }`}
-          >
-            <div className={`w-5 h-5 rounded mt-0.5 flex items-center justify-center border transition-all text-xs font-bold ${
-              includeInsightCard 
-                ? 'bg-[#DC143C] border-[#DC143C] text-white' 
-                : 'border-zinc-700 bg-zinc-900'
-            }`}>
-              {includeInsightCard && '✓'}
-            </div>
-
-            <div>
-              <h4 className="text-xs font-bold text-zinc-200 uppercase tracking-wider font-google-sans">
-                4th Insight Card (Deep Dimension)
-              </h4>
-              <p className="text-[10px] text-zinc-500 mt-0.5">
-                Expands spread to four keys, factoring hidden astral shadow currents.
-              </p>
+              {/* Checkbox 2: Follow-up question & 4th card */}
+              <label className="group flex items-center gap-1 cursor-pointer text-[8.5px] uppercase font-bold tracking-wider text-zinc-400 hover:text-[#DC143C] active:text-[#DC143C] select-none transition-colors">
+                <input
+                  type="checkbox"
+                  checked={enableFollowUp}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setEnableFollowUp(checked);
+                    setIncludeInsightCard(checked);
+                    if (checked && !slots.slotD) {
+                      setActiveSlot('slotD');
+                    } else if (!checked) {
+                      setFollowUpQuestion('');
+                    }
+                  }}
+                  className="accent-[#DC143C] w-3 h-3 rounded cursor-pointer transition-all duration-150 hover:brightness-125 focus:ring-2 focus:ring-[#DC143C] focus:ring-offset-1 focus:ring-offset-black active:scale-95"
+                />
+                <span className={`transition-colors group-hover:text-[#DC143C] ${enableFollowUp ? 'text-[#DC143C] font-bold' : 'text-zinc-500'}`}>
+                  FOLLOW-UP QUESTION
+                </span>
+              </label>
             </div>
           </div>
 
+          <input
+            type="text"
+            value={customQuestion}
+            onChange={(e) => setCustomQuestion(e.target.value)}
+            disabled={!attachQuestion}
+            placeholder="Inquiries welcomed but not necessary..."
+            className={`w-full text-[10.5px] px-3 py-2 rounded-lg outline-none font-google-sans transition-all duration-200 select-text ${
+              attachQuestion
+                ? 'bg-zinc-950 border border-zinc-800 focus:border-[#DC143C] text-zinc-200 placeholder-zinc-500 shadow-inner cursor-text'
+                : 'bg-zinc-950/40 border border-zinc-900/60 text-zinc-600 placeholder-zinc-700 cursor-not-allowed opacity-50'
+            }`}
+          />
         </div>
 
-        {/* Dynamic Revealed Input for Question */}
-        {attachQuestion && (
-          <div className="pt-2 animate-fadeIn">
-            <label className="text-[10px] uppercase font-mono tracking-widest text-[#DC143C] font-bold block mb-1.5">
-              Specify Querent Inquiry:
+        {/* Revealed Follow-up Question Input */}
+        {enableFollowUp && (
+          <div className="pt-0.5 animate-fadeIn space-y-1">
+            <label className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 font-bold block">
+              OUTCOME &amp; RESOLUTIONS
             </label>
             <input
               type="text"
-              value={customQuestion}
-              onChange={(e) => setCustomQuestion(e.target.value)}
-              placeholder="e.g. What unseen karmic obstacles surround my creative or romantic endeavor?"
-              className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#DC143C] text-xs px-3.5 py-2.5 rounded-lg text-zinc-200 outline-none font-google-sans placeholder-zinc-700 shadow-inner"
+              value={followUpQuestion}
+              onChange={(e) => setFollowUpQuestion(e.target.value)}
+              placeholder="Draw a fourth card for additional insight."
+              className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#DC143C] text-[10.5px] px-3 py-2 rounded-lg text-zinc-200 outline-none font-google-sans placeholder-zinc-500 shadow-inner select-text cursor-text"
             />
           </div>
         )}
@@ -880,10 +879,10 @@ export const UploadSpread: React.FC<UploadSpreadProps> = ({ onCompleteReading, o
         <button
           onClick={handleProceedToReading}
           disabled={!isReadyToProceed || isSynthesizing}
-          className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer font-syne ${
+          className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2.5 font-syne border ${
             isReadyToProceed && !isSynthesizing
-              ? 'bg-[#DC143C] hover:bg-[#B81132] text-white shadow-[0_4px_25px_rgba(220,20,60,0.3)] hover:scale-[1.02]'
-              : 'bg-zinc-900 text-zinc-700 cursor-not-allowed border border-zinc-850'
+              ? 'bg-black text-[#DC143C] border-[#DC143C] hover:bg-[#DC143C]/10 shadow-[0_0_20px_rgba(220,20,60,0.3)] hover:shadow-[0_0_28px_rgba(220,20,60,0.45)] hover:scale-[1.02] cursor-pointer'
+              : 'bg-zinc-950 text-zinc-700 cursor-not-allowed border-zinc-900'
           }`}
         >
           {isSynthesizing ? (
